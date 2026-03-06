@@ -112,3 +112,17 @@ export async function getHeatmap(thumbId, password) {
   const res = await fetch(`${BASE}/results/heatmap/${thumbId}`, { headers: headers(password) });
   return res.json();
 }
+
+export async function submitClicks(sessionId, clicks) {
+  const res = await fetch(`${BASE}/session/${sessionId}/clicks`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ clicks }),
+  });
+  return res.json();
+}
+
+export async function getClickHeatmap(thumbId, password) {
+  const res = await fetch(`${BASE}/results/clicks/${thumbId}`, { headers: headers(password) });
+  return res.json();
+}

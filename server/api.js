@@ -78,6 +78,7 @@ router.delete('/thumbnails/:id', requireAdmin, (req, res) => {
   if (thumb) {
     const filepath = path.join(uploadsDir, thumb.filename);
     try { fs.unlinkSync(filepath); } catch {}
+    db.prepare('DELETE FROM click_heatmap WHERE thumbnail_id = ?').run(req.params.id);
     db.prepare('DELETE FROM memory_tests WHERE thumbnail_id = ?').run(req.params.id);
     db.prepare('DELETE FROM mouse_tracking WHERE duel_id IN (SELECT id FROM duels WHERE thumb_left_id = ? OR thumb_right_id = ?)').run(req.params.id, req.params.id);
     db.prepare('DELETE FROM duels WHERE thumb_left_id = ? OR thumb_right_id = ?').run(req.params.id, req.params.id);
@@ -107,6 +108,7 @@ router.post('/config/deactivate', requireAdmin, (req, res) => {
 });
 
 router.post('/config/reset', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM click_heatmap').run();
   db.prepare('DELETE FROM mouse_tracking').run();
   db.prepare('DELETE FROM memory_tests').run();
   db.prepare('DELETE FROM duels').run();
@@ -256,6 +258,30 @@ router.post('/session/:id/memory', (req, res) => {
   res.json({ ok: true });
 });
 
+// --- Click heatmap ---
+router.post('/session/:id/clicks', (req, res) => {
+  const { clicks } = req.body; // array of { thumbnailId, xPct, yPct, clickTimeMs }
+  const sessionId = req.params.id;
+
+  const session = db.prepare('SELECT id FROM sessions WHERE id = ?').get(sessionId);
+  if (!session) {
+    return res.status(404).json({ error: 'Session introuvable' });
+  }
+
+  const insert = db.prepare(
+    'INSERT INTO click_heatmap (session_id, thumbnail_id, x_pct, y_pct, click_time_ms) VALUES (?, ?, ?, ?, ?)'
+  );
+
+  const insertAll = db.transaction((clicksList) => {
+    for (const c of clicksList) {
+      insert.run(sessionId, c.thumbnailId, c.xPct, c.yPct, c.clickTimeMs);
+    }
+  });
+
+  insertAll(clicks);
+  res.json({ ok: true });
+});
+
 // --- Results ---
 router.get('/results', requireAdmin, (req, res) => {
   const thumbnails = db.prepare('SELECT * FROM thumbnails').all();
@@ -358,6 +384,19 @@ router.get('/results/heatmap/:thumbId', requireAdmin, (req, res) => {
   }
 
   res.json({ points });
+});
+
+// --- Click heatmap results ---
+router.get('/results/clicks/:thumbId', requireAdmin, (req, res) => {
+  const thumbId = req.params.thumbId;
+
+  const clicks = db.prepare(`
+    SELECT ch.x_pct, ch.y_pct, ch.click_time_ms FROM click_heatmap ch
+    JOIN sessions s ON ch.session_id = s.id
+    WHERE s.is_valid = 1 AND ch.thumbnail_id = ?
+  `).all(thumbId);
+
+  res.json({ clicks });
 });
 
 module.exports = router;

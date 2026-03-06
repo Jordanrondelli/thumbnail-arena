@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getSessionPairs, submitDuels, submitMemory } from '../utils/api';
+import { getSessionPairs, submitDuels, submitMemory, submitClicks } from '../utils/api';
 
 // --- Step Intro ---
 function StepIntro({ onStart }) {
@@ -61,7 +61,6 @@ function StepDuel({ pairs, onComplete }) {
     }
   }, [results, currentIndex, pairs, onComplete]);
 
-  // Timer
   useEffect(() => {
     startTimeRef.current = Date.now();
     trackingRef.current = [];
@@ -89,7 +88,6 @@ function StepDuel({ pairs, onComplete }) {
     return () => clearInterval(timerRef.current);
   }, [currentIndex, pair]);
 
-  // Mouse/touch tracking
   useEffect(() => {
     const handler = (e) => {
       const x = e.clientX ?? e.touches?.[0]?.clientX;
@@ -138,7 +136,6 @@ function StepDuel({ pairs, onComplete }) {
 
   return (
     <div style={duelStyles.container} className="fade-in">
-      {/* Timer bar */}
       <div style={duelStyles.timerTrack}>
         <div style={{ ...duelStyles.timerBar, width: `${progress * 100}%`, background: barColor }} />
       </div>
@@ -260,7 +257,6 @@ function StepMemory({ thumbnails, onComplete }) {
     { bg: '#34D399', emoji: '🍀' },
   ];
 
-  // Mix thumbnails with colored blocks
   const items = [
     ...thumbnails.map((t) => ({ type: 'thumb', ...t })),
     ...distractorColors.map((c, i) => ({ type: 'color', id: `color-${i}`, ...c })),
@@ -344,6 +340,131 @@ function StepMemory({ thumbnails, onComplete }) {
   );
 }
 
+// --- Step Eye Tracking (Heatmap) ---
+function StepEyeTrack({ thumbnails, onComplete }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(5000);
+  const [clicks, setClicks] = useState([]);
+  const [ripples, setRipples] = useState([]);
+  const startTimeRef = useRef(Date.now());
+  const timerRef = useRef(null);
+  const imgRef = useRef(null);
+  const thumb = thumbnails[currentIndex];
+
+  const advance = useCallback(() => {
+    if (currentIndex + 1 >= thumbnails.length) {
+      onComplete(clicks);
+    } else {
+      setCurrentIndex((i) => i + 1);
+      setTimeLeft(5000);
+      startTimeRef.current = Date.now();
+      setRipples([]);
+    }
+  }, [currentIndex, thumbnails, clicks, onComplete]);
+
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+    setTimeLeft(5000);
+    setRipples([]);
+
+    timerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const remaining = Math.max(0, 5000 - elapsed);
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(timerRef.current);
+        advance();
+      }
+    }, 30);
+
+    return () => clearInterval(timerRef.current);
+  }, [currentIndex]);
+
+  const handleClick = (e) => {
+    const rect = imgRef.current.getBoundingClientRect();
+    const x = (e.clientX ?? e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY ?? e.touches?.[0]?.clientY) - rect.top;
+    const xPct = (x / rect.width) * 100;
+    const yPct = (y / rect.height) * 100;
+    const clickTime = Date.now() - startTimeRef.current;
+
+    if (xPct < 0 || xPct > 100 || yPct < 0 || yPct > 100) return;
+
+    setClicks((prev) => [...prev, {
+      thumbnailId: thumb.id,
+      xPct: Math.round(xPct * 100) / 100,
+      yPct: Math.round(yPct * 100) / 100,
+      clickTimeMs: clickTime,
+    }]);
+
+    // Visual ripple feedback
+    setRipples((prev) => [...prev, { id: Date.now(), x: xPct, y: yPct }]);
+  };
+
+  const progress = timeLeft / 5000;
+  const barColor = progress > 0.5
+    ? 'linear-gradient(90deg, var(--purple), var(--pink))'
+    : progress > 0.2
+    ? 'linear-gradient(90deg, var(--orange), var(--yellow))'
+    : 'linear-gradient(90deg, var(--red), var(--pink))';
+
+  return (
+    <div style={eyeStyles.container} className="fade-in">
+      <div style={eyeStyles.timerTrack}>
+        <div style={{ ...eyeStyles.timerBar, width: `${progress * 100}%`, background: barColor }} />
+      </div>
+
+      <div style={eyeStyles.header}>
+        <div style={{ fontSize: '1.5rem', animation: 'wiggle 1s ease-in-out infinite', display: 'inline-block' }}>👁️</div>
+        <h2 style={eyeStyles.title}>Ou ton regard se pose-t-il en premier ?</h2>
+        <p style={eyeStyles.subtitle}>Clique sur la zone qui attire ton attention</p>
+      </div>
+
+      <div style={eyeStyles.counter}>
+        <span style={eyeStyles.counterCurrent}>{currentIndex + 1}</span>
+        <span style={eyeStyles.counterTotal}> / {thumbnails.length}</span>
+      </div>
+
+      <div style={eyeStyles.imgContainer}>
+        <img
+          ref={imgRef}
+          src={`/uploads/${thumb.filename}`}
+          alt=""
+          style={eyeStyles.img}
+          onClick={handleClick}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            handleClick({ clientX: touch.clientX, clientY: touch.clientY });
+          }}
+          draggable={false}
+        />
+        {/* Ripple feedback */}
+        {ripples.map((r) => (
+          <div key={r.id} style={{
+            position: 'absolute',
+            left: `${r.x}%`,
+            top: `${r.y}%`,
+            width: '40px',
+            height: '40px',
+            marginLeft: '-20px',
+            marginTop: '-20px',
+            borderRadius: '50%',
+            background: 'rgba(139, 92, 246, 0.4)',
+            border: '3px solid var(--purple)',
+            animation: 'pop 0.5s ease-out forwards',
+            pointerEvents: 'none',
+          }} />
+        ))}
+      </div>
+
+      <div style={eyeStyles.hint}>
+        <span>👆</span> Tu peux cliquer plusieurs fois !
+      </div>
+    </div>
+  );
+}
+
 // --- Step Thanks ---
 function StepThanks() {
   return (
@@ -416,6 +537,13 @@ export default function Participant() {
     try {
       await submitMemory(sessionData.sessionId, recognized);
     } catch {}
+    setStep('eyetrack');
+  };
+
+  const handleEyeTrackComplete = async (clicksData) => {
+    try {
+      await submitClicks(sessionData.sessionId, clicksData);
+    } catch {}
     setStep('thanks');
   };
 
@@ -456,6 +584,7 @@ export default function Participant() {
   if (step === 'duels') return <StepDuel pairs={sessionData.pairs} onComplete={handleDuelsComplete} />;
   if (step === 'distractor') return <StepDistractor onComplete={handleDistractorComplete} />;
   if (step === 'memory') return <StepMemory thumbnails={sessionData.thumbnails} onComplete={handleMemoryComplete} />;
+  if (step === 'eyetrack') return <StepEyeTrack thumbnails={sessionData.thumbnails} onComplete={handleEyeTrackComplete} />;
   if (step === 'thanks') return <StepThanks />;
 
   return null;
@@ -626,5 +755,102 @@ const duelStyles = {
     fontWeight: 700,
     fontSize: '1rem',
     color: 'white',
+  },
+};
+
+const eyeStyles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    minHeight: 'calc(100vh - 68px)',
+    padding: '16px',
+    position: 'relative',
+  },
+  timerTrack: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '6px',
+    background: 'var(--bg-secondary)',
+    borderRadius: '0 0 3px 3px',
+  },
+  timerBar: {
+    height: '100%',
+    transition: 'width 0.05s linear',
+    borderRadius: '0 3px 3px 0',
+  },
+  header: {
+    textAlign: 'center',
+    marginTop: '24px',
+    marginBottom: '12px',
+  },
+  title: {
+    fontFamily: 'var(--font-title)',
+    fontSize: '1.3rem',
+    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    marginTop: '4px',
+    marginBottom: '4px',
+  },
+  subtitle: {
+    fontSize: '0.9rem',
+    color: 'var(--text-muted)',
+    fontWeight: 600,
+  },
+  counter: {
+    marginBottom: '16px',
+    background: 'var(--bg-card)',
+    padding: '6px 16px',
+    borderRadius: '12px',
+    border: '2px solid var(--border)',
+    boxShadow: 'var(--shadow-sm)',
+  },
+  counterCurrent: {
+    fontFamily: 'var(--font-title)',
+    fontSize: '1.1rem',
+    fontWeight: 700,
+    color: 'var(--purple)',
+  },
+  counterTotal: {
+    fontFamily: 'var(--font-body)',
+    fontSize: '0.9rem',
+    color: 'var(--text-muted)',
+  },
+  imgContainer: {
+    position: 'relative',
+    width: '100%',
+    maxWidth: '700px',
+    borderRadius: '20px',
+    overflow: 'hidden',
+    border: '4px solid var(--border)',
+    boxShadow: 'var(--shadow-lg)',
+    cursor: 'crosshair',
+    touchAction: 'none',
+    background: 'var(--bg-card)',
+  },
+  img: {
+    width: '100%',
+    aspectRatio: '16/9',
+    objectFit: 'cover',
+    display: 'block',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    pointerEvents: 'auto',
+  },
+  hint: {
+    marginTop: '16px',
+    fontSize: '0.9rem',
+    color: 'var(--text-muted)',
+    fontWeight: 600,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    background: 'var(--bg-card)',
+    padding: '8px 18px',
+    borderRadius: '12px',
+    border: '2px solid var(--border)',
   },
 };

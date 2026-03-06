@@ -70,6 +70,19 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_duels_thumbs ON duels(thumb_left_id, thumb_right_id);
   CREATE INDEX IF NOT EXISTS idx_memory_session ON memory_tests(session_id);
   CREATE INDEX IF NOT EXISTS idx_memory_thumb ON memory_tests(thumbnail_id);
+
+  CREATE TABLE IF NOT EXISTS click_heatmap (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL REFERENCES sessions(id),
+    thumbnail_id TEXT NOT NULL REFERENCES thumbnails(id),
+    x_pct REAL NOT NULL,
+    y_pct REAL NOT NULL,
+    click_time_ms INTEGER NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_click_heatmap_session ON click_heatmap(session_id);
+  CREATE INDEX IF NOT EXISTS idx_click_heatmap_thumb ON click_heatmap(thumbnail_id);
 `);
 
 module.exports = db;
