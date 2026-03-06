@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -7,36 +7,39 @@
 }
 
 :root {
-  --bg-primary: #FFF8F0;
-  --bg-secondary: #FFF0E0;
+  --bg-primary: #FAFAFA;
+  --bg-secondary: #F1F5F9;
   --bg-card: #FFFFFF;
-  --bg-card-hover: #FFF5EB;
-  --border: #F0D6FF;
-  --border-subtle: #FFE4C4;
-  --purple: #8B5CF6;
-  --purple-light: rgba(139, 92, 246, 0.12);
-  --pink: #EC4899;
-  --pink-light: rgba(236, 72, 153, 0.12);
-  --blue: #3B82F6;
-  --blue-light: rgba(59, 130, 246, 0.12);
-  --orange: #F97316;
-  --orange-light: rgba(249, 115, 22, 0.12);
-  --green: #10B981;
-  --green-light: rgba(16, 185, 129, 0.12);
-  --red: #EF4444;
-  --red-light: rgba(239, 68, 68, 0.12);
-  --yellow: #FBBF24;
-  --yellow-light: rgba(251, 191, 36, 0.15);
-  --text-primary: #2D1B4E;
-  --text-secondary: #6B5A85;
-  --text-muted: #A89BBE;
-  --font-title: 'Fredoka', sans-serif;
-  --font-body: 'Nunito', sans-serif;
-  --shadow-sm: 0 2px 8px rgba(139, 92, 246, 0.08);
-  --shadow-md: 0 4px 20px rgba(139, 92, 246, 0.12);
-  --shadow-lg: 0 8px 40px rgba(139, 92, 246, 0.15);
-  --shadow-pop: 0 6px 0 rgba(139, 92, 246, 0.2);
-  --radius: 20px;
+  --bg-card-hover: #F8FAFC;
+  --border: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --accent: #4F46E5;
+  --accent-light: rgba(79, 70, 229, 0.08);
+  --accent-medium: rgba(79, 70, 229, 0.15);
+  --purple: #4F46E5;
+  --purple-light: rgba(79, 70, 229, 0.08);
+  --pink: #7C3AED;
+  --pink-light: rgba(124, 58, 237, 0.08);
+  --blue: #2563EB;
+  --blue-light: rgba(37, 99, 235, 0.08);
+  --orange: #EA580C;
+  --orange-light: rgba(234, 88, 12, 0.08);
+  --green: #059669;
+  --green-light: rgba(5, 150, 105, 0.08);
+  --red: #DC2626;
+  --red-light: rgba(220, 38, 38, 0.06);
+  --yellow: #D97706;
+  --yellow-light: rgba(217, 119, 6, 0.08);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --font-title: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.1);
+  --shadow-pop: 0 2px 0 rgba(0, 0, 0, 0.05);
+  --radius: 12px;
 }
 
 html {
@@ -47,10 +50,6 @@ html {
 body {
   font-family: var(--font-body);
   background: var(--bg-primary);
-  background-image:
-    radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.6;
@@ -60,10 +59,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
   font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 a {
-  color: var(--purple);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -72,15 +72,16 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 button:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-1px);
 }
 
 button:active {
-  transform: translateY(1px) scale(0.98);
+  transform: translateY(0);
+  opacity: 0.9;
 }
 
 input {
@@ -89,20 +90,20 @@ input {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--purple);
+  background: var(--text-muted);
 }
 
 /* Animations */
@@ -112,47 +113,44 @@ input {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(-20px); }
+  from { opacity: 0; transform: translateX(-12px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes bounceIn {
-  0% { opacity: 0; transform: scale(0.3); }
-  50% { opacity: 1; transform: scale(1.05); }
-  70% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes wiggle {
   0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-3deg); }
-  75% { transform: rotate(3deg); }
+  25% { transform: rotate(-1deg); }
+  75% { transform: rotate(1deg); }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-4px); }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 @keyframes pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(236, 72, 153, 0.2); }
+  0%, 100% { box-shadow: 0 0 8px rgba(79, 70, 229, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.35); }
 }
 
 @keyframes rainbow {
@@ -161,18 +159,18 @@ input {
 }
 
 .fade-in {
-  animation: fadeIn 0.4s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .slide-up {
-  animation: slideUp 0.5s ease-out;
+  animation: slideUp 0.4s ease-out;
 }
 
 .bounce-in {
-  animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: bounceIn 0.3s ease-out;
 }
 
 ::selection {
-  background: var(--purple);
+  background: var(--accent);
   color: white;
 }

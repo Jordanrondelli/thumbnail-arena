@@ -6,52 +6,51 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '68px',
-    background: 'rgba(255, 248, 240, 0.85)',
-    backdropFilter: 'blur(16px)',
-    borderBottom: '3px solid var(--border)',
+    height: '56px',
+    background: 'rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    borderBottom: '1px solid var(--border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 28px',
+    padding: '0 24px',
     zIndex: 1000,
   },
   logo: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.4rem',
-    fontWeight: 700,
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    letterSpacing: '-0.01em',
+    fontSize: '0.85rem',
+    fontWeight: 800,
+    color: 'var(--text-primary)',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
   },
   links: {
     display: 'flex',
-    gap: '8px',
+    gap: '4px',
   },
   link: {
     fontFamily: 'var(--font-title)',
-    fontSize: '0.9rem',
+    fontSize: '0.85rem',
     fontWeight: 500,
-    padding: '8px 18px',
-    borderRadius: '14px',
-    color: 'var(--text-secondary)',
+    padding: '6px 14px',
+    borderRadius: '8px',
+    color: 'var(--text-muted)',
     textDecoration: 'none',
-    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    border: '2px solid transparent',
+    transition: 'all 0.15s ease',
+    border: 'none',
   },
   activeLink: {
-    color: 'white',
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-    border: '2px solid transparent',
-    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
+    color: 'var(--accent)',
+    background: 'var(--accent-light)',
+    fontWeight: 600,
   },
 };
 
 export default function Navbar() {
   return (
     <nav style={styles.nav}>
-      <div style={styles.logo}>THUMBNAIL ARENA</div>
+      <div style={styles.logo}>Thumbnail Arena</div>
       <div style={styles.links}>
         <NavLink
           to="/"

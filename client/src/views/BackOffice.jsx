@@ -4,10 +4,10 @@ import { getThumbnails, uploadThumbnails, deleteThumbnail, activateTest, deactiv
 
 const styles = {
   page: {
-    maxWidth: '1100px',
+    maxWidth: '1000px',
     margin: '0 auto',
     padding: '32px 20px',
-    animation: 'slideUp 0.5s ease-out',
+    animation: 'slideUp 0.4s ease-out',
   },
   header: {
     display: 'flex',
@@ -15,120 +15,110 @@ const styles = {
     justifyContent: 'space-between',
     flexWrap: 'wrap',
     gap: '16px',
-    marginBottom: '24px',
-  },
-  titleRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  titleEmoji: {
-    fontSize: '2.2rem',
-    animation: 'wiggle 2s ease-in-out infinite',
-    display: 'inline-block',
+    marginBottom: '28px',
   },
   title: {
-    fontSize: '2rem',
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    color: 'var(--text-primary)',
+    letterSpacing: '-0.02em',
   },
   actions: {
     display: 'flex',
-    gap: '10px',
+    gap: '8px',
     flexWrap: 'wrap',
   },
   btnPrimary: {
-    padding: '12px 24px',
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    padding: '10px 20px',
+    background: 'var(--accent)',
     color: 'white',
-    fontSize: '0.9rem',
+    fontSize: '0.85rem',
     fontWeight: 600,
-    borderRadius: '14px',
-    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3), 0 3px 0 rgba(139, 92, 246, 0.2)',
-  },
-  btnDanger: {
-    padding: '12px 24px',
-    background: 'var(--red-light)',
-    color: 'var(--red)',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    borderRadius: '14px',
-    border: '2px solid rgba(239, 68, 68, 0.3)',
-  },
-  dropzone: {
-    border: '3px dashed var(--border)',
-    borderRadius: '24px',
-    padding: '52px 24px',
-    textAlign: 'center',
-    cursor: 'pointer',
-    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    marginBottom: '32px',
-    background: 'var(--bg-card)',
+    borderRadius: '10px',
     boxShadow: 'var(--shadow-sm)',
   },
-  dropzoneActive: {
-    borderColor: 'var(--purple)',
-    background: 'var(--purple-light)',
-    transform: 'scale(1.01)',
-    boxShadow: '0 0 30px rgba(139, 92, 246, 0.15)',
+  btnDanger: {
+    padding: '10px 20px',
+    background: 'var(--red-light)',
+    color: 'var(--red)',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    borderRadius: '10px',
+    border: '1px solid rgba(220, 38, 38, 0.15)',
   },
-  dropEmoji: {
-    fontSize: '3rem',
-    marginBottom: '12px',
-    display: 'inline-block',
+  dropzone: {
+    border: '2px dashed var(--border)',
+    borderRadius: '14px',
+    padding: '48px 24px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    marginBottom: '28px',
+    background: 'var(--bg-card)',
+  },
+  dropzoneActive: {
+    borderColor: 'var(--accent)',
+    background: 'var(--accent-light)',
+  },
+  dropIcon: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '12px',
+    background: 'var(--accent-light)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 14px',
   },
   dropText: {
-    fontSize: '1.1rem',
+    fontSize: '0.95rem',
     color: 'var(--text-secondary)',
-    fontFamily: 'var(--font-title)',
     fontWeight: 500,
   },
   dropHint: {
-    fontSize: '0.85rem',
+    fontSize: '0.8rem',
     color: 'var(--text-muted)',
-    marginTop: '8px',
+    marginTop: '6px',
   },
   // Tabs
   tabBar: {
     display: 'flex',
-    gap: '8px',
+    gap: '2px',
     marginBottom: '24px',
-    background: 'var(--bg-card)',
-    padding: '6px',
-    borderRadius: '18px',
-    border: '3px solid var(--border)',
-    boxShadow: 'var(--shadow-sm)',
+    background: 'var(--bg-secondary)',
+    padding: '3px',
+    borderRadius: '10px',
   },
   tab: {
     flex: 1,
-    padding: '12px 20px',
-    borderRadius: '14px',
+    padding: '10px 18px',
+    borderRadius: '8px',
     fontFamily: 'var(--font-title)',
-    fontSize: '1rem',
-    fontWeight: 600,
+    fontSize: '0.85rem',
+    fontWeight: 500,
     background: 'transparent',
     color: 'var(--text-muted)',
-    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    transition: 'all 0.15s ease',
     border: 'none',
   },
   tabActive: {
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-    color: 'white',
-    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
+    background: 'var(--bg-card)',
+    color: 'var(--text-primary)',
+    fontWeight: 600,
+    boxShadow: 'var(--shadow-sm)',
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '18px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+    gap: '14px',
   },
   card: {
     position: 'relative',
-    borderRadius: '18px',
+    borderRadius: '12px',
     overflow: 'hidden',
-    border: '3px solid var(--border)',
+    border: '1px solid var(--border)',
     background: 'var(--bg-card)',
-    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    transition: 'all 0.2s ease',
     boxShadow: 'var(--shadow-sm)',
   },
   img: {
@@ -139,60 +129,57 @@ const styles = {
   },
   deleteBtn: {
     position: 'absolute',
-    top: '10px',
-    right: '10px',
-    width: '34px',
-    height: '34px',
-    borderRadius: '12px',
-    background: 'white',
+    top: '8px',
+    right: '8px',
+    width: '28px',
+    height: '28px',
+    borderRadius: '8px',
+    background: 'rgba(255,255,255,0.9)',
+    backdropFilter: 'blur(8px)',
     color: 'var(--red)',
-    fontSize: '1.2rem',
+    fontSize: '1rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     lineHeight: 1,
-    boxShadow: 'var(--shadow-md)',
-    border: '2px solid rgba(239, 68, 68, 0.2)',
+    boxShadow: 'var(--shadow-sm)',
+    border: '1px solid rgba(0,0,0,0.06)',
   },
   status: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '8px 16px',
-    borderRadius: '14px',
-    fontSize: '0.85rem',
-    fontFamily: 'var(--font-title)',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: '8px',
+    fontSize: '0.8rem',
     fontWeight: 500,
   },
   statusActive: {
     background: 'var(--green-light)',
     color: 'var(--green)',
-    border: '2px solid rgba(16, 185, 129, 0.2)',
   },
   statusInactive: {
-    background: 'rgba(168, 155, 190, 0.1)',
+    background: 'var(--bg-secondary)',
     color: 'var(--text-muted)',
-    border: '2px solid var(--border)',
   },
   count: {
-    fontSize: '0.9rem',
-    color: 'var(--text-secondary)',
-    fontWeight: 600,
-    background: 'var(--bg-card)',
-    padding: '6px 14px',
-    borderRadius: '10px',
-    border: '2px solid var(--border)',
+    fontSize: '0.8rem',
+    color: 'var(--text-muted)',
+    fontWeight: 500,
+    background: 'var(--bg-secondary)',
+    padding: '6px 12px',
+    borderRadius: '8px',
   },
   // Heatmap styles
   heatmapGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-    gap: '24px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '16px',
   },
   heatmapCard: {
     background: 'var(--bg-card)',
-    border: '3px solid var(--border)',
-    borderRadius: '22px',
+    border: '1px solid var(--border)',
+    borderRadius: '12px',
     overflow: 'hidden',
     boxShadow: 'var(--shadow-sm)',
   },
@@ -221,33 +208,34 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(0,0,0,0.3)',
-    color: 'white',
+    background: 'rgba(0,0,0,0.4)',
+    color: 'rgba(255,255,255,0.8)',
     fontFamily: 'var(--font-title)',
-    fontSize: '0.95rem',
+    fontSize: '0.85rem',
     fontWeight: 500,
   },
   heatmapCount: {
     position: 'absolute',
-    bottom: '10px',
-    right: '10px',
-    background: 'rgba(0,0,0,0.7)',
+    bottom: '8px',
+    right: '8px',
+    background: 'rgba(0,0,0,0.6)',
+    backdropFilter: 'blur(8px)',
     color: 'white',
-    padding: '4px 12px',
-    borderRadius: '10px',
+    padding: '3px 10px',
+    borderRadius: '6px',
     fontFamily: 'var(--font-title)',
-    fontSize: '0.8rem',
+    fontSize: '0.75rem',
     fontWeight: 500,
   },
   heatmapInfo: {
-    padding: '14px 18px',
+    padding: '10px 14px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   heatmapName: {
     fontFamily: 'var(--font-title)',
-    fontSize: '0.95rem',
+    fontSize: '0.8rem',
     color: 'var(--text-secondary)',
     fontWeight: 500,
   },
@@ -327,19 +315,15 @@ function BackOfficeContent({ password }) {
     <div style={styles.page}>
       <div style={styles.header}>
         <div>
-          <div style={styles.titleRow}>
-            <span style={styles.titleEmoji}>🎛️</span>
-            <h1 style={styles.title}>Back Office</h1>
-          </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '12px' }}>
+          <h1 style={styles.title}>Back Office</h1>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '10px' }}>
             <span style={{ ...styles.status, ...(isActive ? styles.statusActive : styles.statusInactive) }}>
               <span style={{
-                width: 10,
-                height: 10,
+                width: 7,
+                height: 7,
                 borderRadius: '50%',
                 background: isActive ? 'var(--green)' : 'var(--text-muted)',
                 display: 'inline-block',
-                boxShadow: isActive ? '0 0 8px rgba(16, 185, 129, 0.5)' : 'none',
               }} />
               {isActive ? 'Test actif' : 'Test inactif'}
             </span>
@@ -362,13 +346,13 @@ function BackOfficeContent({ password }) {
           style={{ ...styles.tab, ...(tab === 'manage' ? styles.tabActive : {}) }}
           onClick={() => setTab('manage')}
         >
-          📸 Miniatures
+          Miniatures
         </button>
         <button
           style={{ ...styles.tab, ...(tab === 'heatmap' ? styles.tabActive : {}) }}
           onClick={() => setTab('heatmap')}
         >
-          🔥 Heatmaps
+          Heatmaps
         </button>
       </div>
 
@@ -388,18 +372,22 @@ function BackOfficeContent({ password }) {
               input.click();
             }}
           >
-            <div style={styles.dropEmoji}>
-              {uploading ? '⏳' : dragOver ? '🎯' : '📸'}
+            <div style={styles.dropIcon}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
             </div>
             <p style={styles.dropText}>
-              {uploading ? 'Upload en cours...' : dragOver ? 'Deposez vos miniatures ici !' : 'Glissez-deposez vos miniatures ici'}
+              {uploading ? 'Upload en cours...' : dragOver ? 'Deposez vos miniatures ici' : 'Glissez-deposez vos miniatures'}
             </p>
-            <p style={styles.dropHint}>ou cliquez pour selectionner des fichiers - JPG, PNG, WebP</p>
+            <p style={styles.dropHint}>ou cliquez pour selectionner — JPG, PNG, WebP</p>
           </div>
 
           <div style={styles.grid}>
             {thumbnails.map((t, i) => (
-              <div key={t.id} style={{ ...styles.card, animation: `slideUp 0.3s ease-out ${i * 0.05}s both` }}>
+              <div key={t.id} style={{ ...styles.card, animation: `slideUp 0.3s ease-out ${i * 0.04}s both` }}>
                 <img src={`/uploads/${t.filename}`} alt={t.original_name} style={styles.img} loading="lazy" />
                 <button style={styles.deleteBtn} onClick={() => handleDelete(t.id)} title="Supprimer">
                   ×
@@ -412,19 +400,17 @@ function BackOfficeContent({ password }) {
 
       {tab === 'heatmap' && (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <span style={{ fontSize: '1.5rem' }}>👁️</span>
-            <h2 style={{ fontFamily: 'var(--font-title)', fontSize: '1.4rem', color: 'var(--text-primary)' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
               Heatmaps d'attention
             </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              Zones ou les participants ont clique en premier sur chaque miniature
+            </p>
           </div>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontWeight: 600 }}>
-            Zones ou les participants ont clique en premier sur chaque miniature
-          </p>
           {thumbnails.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '12px' }}>📭</div>
-              <p style={{ fontFamily: 'var(--font-title)', fontSize: '1.1rem' }}>Aucune miniature uploadee</p>
+              <p style={{ fontSize: '0.95rem' }}>Aucune miniature uploadee</p>
             </div>
           ) : (
             <div style={styles.heatmapGrid}>
@@ -466,17 +452,17 @@ function HeatmapCard({ thumb, password, index }) {
 
     if (clicks.length === 0) return;
 
-    const radius = Math.max(30, Math.min(w, h) * 0.08);
+    const radius = Math.max(25, Math.min(w, h) * 0.07);
 
     for (const click of clicks) {
       const x = (click.x_pct / 100) * w;
       const y = (click.y_pct / 100) * h;
 
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      gradient.addColorStop(0, 'rgba(255, 0, 0, 0.35)');
-      gradient.addColorStop(0.4, 'rgba(255, 80, 0, 0.2)');
-      gradient.addColorStop(0.7, 'rgba(255, 160, 0, 0.1)');
-      gradient.addColorStop(1, 'rgba(255, 200, 0, 0)');
+      gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
+      gradient.addColorStop(0.4, 'rgba(99, 102, 241, 0.2)');
+      gradient.addColorStop(0.7, 'rgba(129, 140, 248, 0.1)');
+      gradient.addColorStop(1, 'rgba(165, 180, 252, 0)');
 
       ctx.fillStyle = gradient;
       ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
@@ -486,11 +472,11 @@ function HeatmapCard({ thumb, password, index }) {
       const x = (click.x_pct / 100) * w;
       const y = (click.y_pct / 100) * h;
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 60, 0, 0.8)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(79, 70, 229, 0.8)';
+      ctx.lineWidth = 1.5;
       ctx.stroke();
     }
   }, [clicks]);
@@ -508,7 +494,7 @@ function HeatmapCard({ thumb, password, index }) {
   return (
     <div style={{
       ...styles.heatmapCard,
-      animation: `slideUp 0.4s ease-out ${index * 0.06}s both`,
+      animation: `slideUp 0.3s ease-out ${index * 0.04}s both`,
     }}>
       <div ref={containerRef} style={styles.heatmapImgWrap}>
         <img
@@ -534,7 +520,7 @@ function HeatmapCard({ thumb, password, index }) {
       </div>
       <div style={styles.heatmapInfo}>
         <span style={styles.heatmapName}>{thumb.original_name}</span>
-        {clicks && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+        {clicks && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
           {clicks.length > 0 ? `${clicks.length} interactions` : 'Aucune donnee'}
         </span>}
       </div>

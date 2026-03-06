@@ -1,6 +1,6 @@
-const SIZE = 150;
+const SIZE = 140;
 const CENTER = SIZE / 2;
-const RADIUS = 52;
+const RADIUS = 48;
 
 const AXES = [
   { label: 'Win Rate', angle: -90 },
@@ -37,28 +37,28 @@ export default function RadarChart({ winRate, speed }) {
           cy={CENTER}
           r={RADIUS * level}
           fill="none"
-          stroke="rgba(139, 92, 246, 0.1)"
-          strokeWidth="1.5"
+          stroke="rgba(79, 70, 229, 0.08)"
+          strokeWidth="1"
         />
       ))}
 
       {/* Axis lines */}
       {AXES.map((axis, i) => {
         const end = polarToCart(axis.angle, RADIUS);
-        return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1.5" />;
+        return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="rgba(79, 70, 229, 0.12)" strokeWidth="1" />;
       })}
 
       {/* Data polygon */}
-      <path d={dataPath} fill="rgba(139, 92, 246, 0.15)" stroke="#8B5CF6" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d={dataPath} fill="rgba(79, 70, 229, 0.1)" stroke="#4F46E5" strokeWidth="2" strokeLinejoin="round" />
 
       {/* Data dots */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="4" fill="#8B5CF6" stroke="white" strokeWidth="2" />
+        <circle key={i} cx={p.x} cy={p.y} r="3.5" fill="#4F46E5" stroke="white" strokeWidth="2" />
       ))}
 
       {/* Labels */}
       {AXES.map((axis, i) => {
-        const pos = polarToCart(axis.angle, RADIUS + 20);
+        const pos = polarToCart(axis.angle, RADIUS + 18);
         return (
           <text
             key={i}
@@ -66,9 +66,9 @@ export default function RadarChart({ winRate, speed }) {
             y={pos.y}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="#6B5A85"
+            fill="#94A3B8"
             fontSize="9"
-            fontFamily="Fredoka, sans-serif"
+            fontFamily="Inter, sans-serif"
             fontWeight="500"
           >
             {axis.label}

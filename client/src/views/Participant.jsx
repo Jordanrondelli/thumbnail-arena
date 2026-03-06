@@ -1,29 +1,33 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getSessionPairs, submitDuels, submitClicks } from '../utils/api';
 
-// --- Step Welcome (new home screen) ---
+// --- Step Welcome ---
 function StepWelcome({ onReady }) {
   return (
     <div style={stepStyles.center} className="fade-in">
-      <div style={{ fontSize: '4rem', marginBottom: '16px', animation: 'float 2s ease-in-out infinite', display: 'inline-block' }}>🎮</div>
+      <div style={stepStyles.iconBox}>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </div>
       <h1 style={stepStyles.introTitle}>Thumbnail Arena</h1>
       <div style={stepStyles.introCard}>
         <p style={stepStyles.introText}>
-          Tu vas participer a <strong>2 tests differents</strong> pour m'aider a choisir la meilleure miniature de video.
+          Tu vas participer a <strong>2 tests</strong> pour m'aider a choisir la meilleure miniature.
         </p>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '8px' }}>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '12px' }}>
           <div style={stepStyles.testBadge}>
-            <span style={{ fontSize: '1.3rem' }}>⚔️</span>
-            <span>Test 1 : Duels</span>
+            <span style={stepStyles.badgeNumber}>1</span>
+            <span>Duels rapides</span>
           </div>
           <div style={stepStyles.testBadge}>
-            <span style={{ fontSize: '1.3rem' }}>👁️</span>
-            <span>Test 2 : Regard</span>
+            <span style={stepStyles.badgeNumber}>2</span>
+            <span>Test de regard</span>
           </div>
         </div>
       </div>
       <button style={stepStyles.startBtn} onClick={onReady}>
-        Je suis pret
+        Commencer
       </button>
     </div>
   );
@@ -33,22 +37,25 @@ function StepWelcome({ onReady }) {
 function StepIntroTest1({ onStart }) {
   return (
     <div style={stepStyles.center} className="fade-in">
-      <div style={{ fontSize: '3rem', marginBottom: '12px' }}>⚔️</div>
-      <h2 style={{ ...stepStyles.introTitle, fontSize: '2rem' }}>Test 1 : Duels</h2>
+      <div style={stepStyles.iconBox}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <h2 style={{ ...stepStyles.introTitle, fontSize: '1.6rem' }}>Test 1 — Duels</h2>
       <div style={stepStyles.introCard}>
         <p style={stepStyles.introText}>
-          Tu vas voir des paires de miniatures. Clique sur celle qui attirerait ton attention.
+          Tu vas voir des paires de miniatures. Clique sur celle qui attire ton attention.
         </p>
         <div style={stepStyles.timerBadge}>
-          <span style={{ fontSize: '1.5rem' }}>⏱</span>
-          <span><strong>2,5 secondes</strong> pour choisir</span>
+          <strong>2,5 secondes</strong> pour choisir
         </div>
-        <p style={{ ...stepStyles.introText, fontSize: '0.95rem', color: 'var(--text-muted)' }}>
-          Clique sur celle qui t'attire instinctivement !
+        <p style={{ ...stepStyles.introText, fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 0 }}>
+          Fie-toi a ton instinct.
         </p>
       </div>
       <button style={stepStyles.startBtn} onClick={onStart}>
-        Commencer
+        C'est parti
       </button>
     </div>
   );
@@ -172,16 +179,11 @@ function StepDuel({ pairs, onComplete }) {
           <span style={duelStyles.counterCurrent}>{currentIndex + 1}</span>
           <span style={duelStyles.counterTotal}> / {pairs.length}</span>
         </div>
-        {selected ? (
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
-        ) : (
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⏰</div>
-        )}
-        <p style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '1.05rem', marginBottom: '8px' }}>
-          {selected ? 'Choix enregistre !' : 'Temps ecoule !'}
+        <p style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.95rem', marginBottom: '8px' }}>
+          {selected ? 'Choix enregistre' : 'Temps ecoule'}
         </p>
         <button style={stepStyles.startBtn} onClick={goToNext}>
-          Passer au duel suivant
+          Suivant
         </button>
       </div>
     );
@@ -189,10 +191,10 @@ function StepDuel({ pairs, onComplete }) {
 
   const progress = timeLeft / DUEL_DURATION;
   const barColor = progress > 0.5
-    ? 'linear-gradient(90deg, var(--green), #34D399)'
+    ? 'var(--accent)'
     : progress > 0.2
-    ? 'linear-gradient(90deg, var(--orange), var(--yellow))'
-    : 'linear-gradient(90deg, var(--red), var(--pink))';
+    ? 'var(--yellow)'
+    : 'var(--red)';
 
   return (
     <div style={duelStyles.container} className="fade-in">
@@ -214,7 +216,9 @@ function StepDuel({ pairs, onComplete }) {
           onClick={() => handleClick(pair.left.id)}
         >
           <img src={`/uploads/${pair.left.filename}`} alt="" style={duelStyles.thumbImg} />
-          {selected === pair.left.id && <div style={duelStyles.selectedOverlay}>&#10003;</div>}
+          {selected === pair.left.id && <div style={duelStyles.selectedOverlay}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>}
         </button>
 
         <div style={duelStyles.vs}>
@@ -229,7 +233,9 @@ function StepDuel({ pairs, onComplete }) {
           onClick={() => handleClick(pair.right.id)}
         >
           <img src={`/uploads/${pair.right.filename}`} alt="" style={duelStyles.thumbImg} />
-          {selected === pair.right.id && <div style={duelStyles.selectedOverlay}>&#10003;</div>}
+          {selected === pair.right.id && <div style={duelStyles.selectedOverlay}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>}
         </button>
       </div>
     </div>
@@ -240,22 +246,25 @@ function StepDuel({ pairs, onComplete }) {
 function StepIntroTest2({ onStart }) {
   return (
     <div style={stepStyles.center} className="fade-in">
-      <div style={{ fontSize: '3rem', marginBottom: '12px' }}>👁️</div>
-      <h2 style={{ ...stepStyles.introTitle, fontSize: '2rem' }}>Test 2 : Regard</h2>
+      <div style={stepStyles.iconBox}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
+      <h2 style={{ ...stepStyles.introTitle, fontSize: '1.6rem' }}>Test 2 — Regard</h2>
       <div style={stepStyles.introCard}>
         <p style={stepStyles.introText}>
-          Une miniature va s'afficher. Clique ou tape sur l'endroit ou ton regard est naturellement attire.
+          Une miniature va s'afficher. Clique sur l'endroit ou ton regard est naturellement attire.
         </p>
         <div style={stepStyles.timerBadge}>
-          <span style={{ fontSize: '1.5rem' }}>⏱</span>
-          <span><strong>5 secondes</strong> par miniature</span>
+          <strong>5 secondes</strong> par miniature
         </div>
-        <p style={{ ...stepStyles.introText, fontSize: '0.95rem', color: 'var(--text-muted)' }}>
-          C'est instinctif, ne reflechis pas trop !
+        <p style={{ ...stepStyles.introText, fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 0 }}>
+          C'est instinctif, ne reflechis pas trop.
         </p>
       </div>
       <button style={stepStyles.startBtn} onClick={onStart}>
-        Commencer
+        C'est parti
       </button>
     </div>
   );
@@ -342,16 +351,11 @@ function StepEyeTrack({ thumbnails, onComplete }) {
           <span style={eyeStyles.counterCurrent}>{currentIndex + 1}</span>
           <span style={eyeStyles.counterTotal}> / {thumbnails.length}</span>
         </div>
-        {hasClicked ? (
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
-        ) : (
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⏰</div>
-        )}
-        <p style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '1.05rem', marginBottom: '8px' }}>
-          {hasClicked ? 'Clic enregistre !' : 'Temps ecoule !'}
+        <p style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.95rem', marginBottom: '8px' }}>
+          {hasClicked ? 'Clic enregistre' : 'Temps ecoule'}
         </p>
         <button style={stepStyles.startBtn} onClick={goToNext}>
-          Passer a la prochaine miniature
+          Suivant
         </button>
       </div>
     );
@@ -359,10 +363,10 @@ function StepEyeTrack({ thumbnails, onComplete }) {
 
   const progress = timeLeft / 5000;
   const barColor = progress > 0.5
-    ? 'linear-gradient(90deg, var(--purple), var(--pink))'
+    ? 'var(--accent)'
     : progress > 0.2
-    ? 'linear-gradient(90deg, var(--orange), var(--yellow))'
-    : 'linear-gradient(90deg, var(--red), var(--pink))';
+    ? 'var(--yellow)'
+    : 'var(--red)';
 
   return (
     <div style={eyeStyles.container} className="fade-in">
@@ -371,8 +375,7 @@ function StepEyeTrack({ thumbnails, onComplete }) {
       </div>
 
       <div style={eyeStyles.header}>
-        <div style={{ fontSize: '1.5rem', animation: 'wiggle 1s ease-in-out infinite', display: 'inline-block' }}>👁️</div>
-        <h2 style={eyeStyles.title}>Ou ton regard se pose-t-il en premier ?</h2>
+        <h2 style={eyeStyles.title}>Ou ton regard se pose-t-il ?</h2>
         <p style={eyeStyles.subtitle}>Clique sur la zone qui attire ton attention</p>
       </div>
 
@@ -400,14 +403,14 @@ function StepEyeTrack({ thumbnails, onComplete }) {
             position: 'absolute',
             left: `${r.x}%`,
             top: `${r.y}%`,
-            width: '40px',
-            height: '40px',
-            marginLeft: '-20px',
-            marginTop: '-20px',
+            width: '32px',
+            height: '32px',
+            marginLeft: '-16px',
+            marginTop: '-16px',
             borderRadius: '50%',
-            background: 'rgba(139, 92, 246, 0.4)',
-            border: '3px solid var(--purple)',
-            animation: 'pop 0.5s ease-out forwards',
+            background: 'rgba(79, 70, 229, 0.3)',
+            border: '2px solid var(--accent)',
+            animation: 'pop 0.4s ease-out forwards',
             pointerEvents: 'none',
           }} />
         ))}
@@ -420,36 +423,21 @@ function StepEyeTrack({ thumbnails, onComplete }) {
 function StepThanks() {
   return (
     <div style={stepStyles.center} className="fade-in">
-      <div style={{
-        fontSize: '5rem',
-        marginBottom: '16px',
-        animation: 'bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-      }}>🎉</div>
+      <div style={{ ...stepStyles.iconBox, width: '56px', height: '56px', borderRadius: '14px', marginBottom: '20px' }}>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
       <h1 style={{
         ...stepStyles.introTitle,
-        fontSize: '2.8rem',
-        animation: 'slideUp 0.5s ease-out 0.2s both',
+        fontSize: '2.2rem',
       }}>Merci !</h1>
       <p style={{
         ...stepStyles.introText,
-        animation: 'slideUp 0.5s ease-out 0.4s both',
+        maxWidth: '400px',
       }}>
-        Ton avis compte enormement. Grace a toi, on va trouver la meilleure miniature !
+        Ton avis compte enormement. Grace a toi, on va trouver la meilleure miniature.
       </p>
-      <div style={{
-        display: 'flex',
-        gap: '12px',
-        marginTop: '20px',
-        animation: 'slideUp 0.5s ease-out 0.6s both',
-      }}>
-        {['🏆', '🎯', '🚀'].map((e, i) => (
-          <span key={i} style={{
-            fontSize: '2rem',
-            animation: `float ${1.5 + i * 0.3}s ease-in-out infinite`,
-            display: 'inline-block',
-          }}>{e}</span>
-        ))}
-      </div>
     </div>
   );
 }
@@ -490,8 +478,12 @@ export default function Participant() {
   if (step === 'loading') {
     return (
       <div style={stepStyles.center}>
-        <div style={{ fontSize: '4rem', marginBottom: '20px', animation: 'float 2s ease-in-out infinite', display: 'inline-block' }}>🎮</div>
-        <button style={stepStyles.startBtn} onClick={init}>Commencer le test</button>
+        <div style={stepStyles.iconBox}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <button style={{ ...stepStyles.startBtn, marginTop: '20px' }} onClick={init}>Commencer le test</button>
       </div>
     );
   }
@@ -499,22 +491,19 @@ export default function Participant() {
   if (step === 'error') {
     return (
       <div style={stepStyles.center}>
-        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>😴</div>
         <h2 style={{
           color: 'var(--text-secondary)',
-          fontFamily: 'var(--font-title)',
-          marginBottom: '12px',
-          fontSize: '1.4rem',
+          fontSize: '1.2rem',
+          marginBottom: '10px',
         }}>
           Test indisponible
         </h2>
         <p style={{
           color: 'var(--text-muted)',
-          fontSize: '1rem',
-          background: 'var(--bg-card)',
-          padding: '12px 24px',
-          borderRadius: '14px',
-          border: '2px solid var(--border)',
+          fontSize: '0.9rem',
+          background: 'var(--bg-secondary)',
+          padding: '10px 20px',
+          borderRadius: '10px',
         }}>{error}</p>
       </div>
     );
@@ -537,72 +526,88 @@ const stepStyles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 68px)',
+    minHeight: 'calc(100vh - 56px)',
     padding: '24px',
     textAlign: 'center',
   },
+  iconBox: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '12px',
+    background: 'var(--accent-light)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '16px',
+  },
   introTitle: {
     fontFamily: 'var(--font-title)',
-    fontSize: '3rem',
-    fontWeight: 700,
-    background: 'linear-gradient(135deg, var(--purple), var(--pink), var(--orange))',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    marginBottom: '24px',
+    fontSize: '2.2rem',
+    fontWeight: 800,
+    color: 'var(--text-primary)',
+    marginBottom: '20px',
+    letterSpacing: '-0.03em',
   },
   introCard: {
     background: 'var(--bg-card)',
-    border: '3px solid var(--border)',
-    borderRadius: '24px',
-    padding: '28px 32px',
-    maxWidth: '500px',
+    border: '1px solid var(--border)',
+    borderRadius: '14px',
+    padding: '24px 28px',
+    maxWidth: '440px',
     boxShadow: 'var(--shadow-md)',
     marginBottom: '8px',
   },
   introText: {
-    fontSize: '1.05rem',
+    fontSize: '0.95rem',
     color: 'var(--text-secondary)',
-    maxWidth: '480px',
-    lineHeight: 1.7,
+    maxWidth: '420px',
+    lineHeight: 1.6,
     marginBottom: '12px',
-    fontWeight: 600,
   },
   timerBadge: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '10px',
-    background: 'linear-gradient(135deg, var(--purple-light), var(--pink-light))',
-    padding: '10px 20px',
-    borderRadius: '14px',
+    gap: '6px',
+    background: 'var(--accent-light)',
+    padding: '8px 16px',
+    borderRadius: '8px',
     marginBottom: '12px',
-    fontFamily: 'var(--font-title)',
-    fontSize: '1rem',
-    color: 'var(--purple)',
+    fontSize: '0.85rem',
+    color: 'var(--accent)',
+    fontWeight: 500,
   },
   testBadge: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
     background: 'var(--bg-secondary)',
-    padding: '10px 16px',
-    borderRadius: '14px',
-    fontFamily: 'var(--font-title)',
-    fontSize: '0.9rem',
+    padding: '8px 14px',
+    borderRadius: '10px',
+    fontSize: '0.85rem',
     color: 'var(--text-secondary)',
-    fontWeight: 600,
-    border: '2px solid var(--border)',
+    fontWeight: 500,
+  },
+  badgeNumber: {
+    width: '22px',
+    height: '22px',
+    borderRadius: '6px',
+    background: 'var(--accent)',
+    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '0.75rem',
+    fontWeight: 700,
   },
   startBtn: {
-    marginTop: '24px',
-    padding: '16px 48px',
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    marginTop: '20px',
+    padding: '12px 36px',
+    background: 'var(--accent)',
     color: 'white',
-    fontSize: '1.15rem',
+    fontSize: '0.95rem',
     fontWeight: 600,
-    borderRadius: '18px',
-    fontFamily: 'var(--font-title)',
-    letterSpacing: '0.02em',
-    boxShadow: '0 6px 20px rgba(139, 92, 246, 0.35), 0 4px 0 rgba(139, 92, 246, 0.2)',
+    borderRadius: '10px',
+    boxShadow: 'var(--shadow-sm)',
   },
 };
 
@@ -612,7 +617,7 @@ const duelStyles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 68px)',
+    minHeight: 'calc(100vh - 56px)',
     padding: '16px',
     position: 'relative',
   },
@@ -621,70 +626,65 @@ const duelStyles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '6px',
+    height: '3px',
     background: 'var(--bg-secondary)',
-    borderRadius: '0 0 3px 3px',
   },
   timerBar: {
     height: '100%',
     transition: 'width 0.05s linear',
-    borderRadius: '0 3px 3px 0',
   },
   counter: {
-    marginBottom: '24px',
+    marginBottom: '20px',
     background: 'var(--bg-card)',
-    padding: '8px 20px',
-    borderRadius: '14px',
-    border: '2px solid var(--border)',
+    padding: '6px 16px',
+    borderRadius: '8px',
+    border: '1px solid var(--border)',
     boxShadow: 'var(--shadow-sm)',
   },
   counterCurrent: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.2rem',
+    fontSize: '1.1rem',
     fontWeight: 700,
-    color: 'var(--purple)',
+    color: 'var(--accent)',
   },
   counterTotal: {
     fontFamily: 'var(--font-body)',
-    fontSize: '1rem',
+    fontSize: '0.9rem',
     color: 'var(--text-muted)',
   },
   arena: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '20px',
+    gap: '16px',
     width: '100%',
-    maxWidth: '920px',
+    maxWidth: '860px',
   },
   thumbBtn: {
     flex: 1,
-    maxWidth: '420px',
+    maxWidth: '400px',
     background: 'var(--bg-card)',
-    border: '4px solid var(--border)',
-    borderRadius: '20px',
+    border: '2px solid var(--border)',
+    borderRadius: '12px',
     overflow: 'hidden',
     cursor: 'pointer',
     padding: 0,
-    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    transition: 'all 0.15s ease',
     boxShadow: 'var(--shadow-md)',
     position: 'relative',
   },
   thumbSelected: {
-    borderColor: 'var(--purple)',
-    boxShadow: '0 0 30px rgba(139, 92, 246, 0.4), 0 6px 0 rgba(139, 92, 246, 0.2)',
-    transform: 'scale(1.03)',
+    borderColor: 'var(--accent)',
+    boxShadow: '0 0 0 3px var(--accent-light), var(--shadow-md)',
   },
   selectedOverlay: {
     position: 'absolute',
     inset: 0,
-    background: 'rgba(139, 92, 246, 0.15)',
+    background: 'rgba(79, 70, 229, 0.2)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '3rem',
-    color: 'var(--purple)',
-    animation: 'bounceIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    animation: 'fadeIn 0.2s ease-out',
   },
   thumbImg: {
     width: '100%',
@@ -694,20 +694,20 @@ const duelStyles = {
   },
   vs: {
     flexShrink: 0,
-    width: '52px',
-    height: '52px',
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, var(--orange), var(--pink))',
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)',
   },
   vsText: {
     fontFamily: 'var(--font-title)',
     fontWeight: 700,
-    fontSize: '1rem',
-    color: 'white',
+    fontSize: '0.8rem',
+    color: 'var(--text-muted)',
   },
 };
 
@@ -716,7 +716,7 @@ const eyeStyles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    minHeight: 'calc(100vh - 68px)',
+    minHeight: 'calc(100vh - 56px)',
     padding: '16px',
     position: 'relative',
   },
@@ -725,60 +725,57 @@ const eyeStyles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '6px',
+    height: '3px',
     background: 'var(--bg-secondary)',
-    borderRadius: '0 0 3px 3px',
   },
   timerBar: {
     height: '100%',
     transition: 'width 0.05s linear',
-    borderRadius: '0 3px 3px 0',
   },
   header: {
     textAlign: 'center',
-    marginTop: '24px',
-    marginBottom: '12px',
+    marginTop: '20px',
+    marginBottom: '10px',
   },
   title: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.3rem',
-    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    marginTop: '4px',
+    fontSize: '1.1rem',
+    fontWeight: 700,
+    color: 'var(--text-primary)',
     marginBottom: '4px',
+    letterSpacing: '-0.01em',
   },
   subtitle: {
-    fontSize: '0.9rem',
+    fontSize: '0.85rem',
     color: 'var(--text-muted)',
-    fontWeight: 600,
+    fontWeight: 400,
   },
   counter: {
-    marginBottom: '16px',
+    marginBottom: '14px',
     background: 'var(--bg-card)',
-    padding: '6px 16px',
-    borderRadius: '12px',
-    border: '2px solid var(--border)',
+    padding: '5px 14px',
+    borderRadius: '8px',
+    border: '1px solid var(--border)',
     boxShadow: 'var(--shadow-sm)',
   },
   counterCurrent: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.1rem',
+    fontSize: '1rem',
     fontWeight: 700,
-    color: 'var(--purple)',
+    color: 'var(--accent)',
   },
   counterTotal: {
     fontFamily: 'var(--font-body)',
-    fontSize: '0.9rem',
+    fontSize: '0.85rem',
     color: 'var(--text-muted)',
   },
   imgContainer: {
     position: 'relative',
     width: '100%',
-    maxWidth: '700px',
-    borderRadius: '20px',
+    maxWidth: '680px',
+    borderRadius: '12px',
     overflow: 'hidden',
-    border: '4px solid var(--border)',
+    border: '1px solid var(--border)',
     boxShadow: 'var(--shadow-lg)',
     cursor: 'crosshair',
     touchAction: 'none',
