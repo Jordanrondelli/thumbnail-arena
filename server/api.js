@@ -6,17 +6,22 @@ const db = require('./db');
 
 const router = express.Router();
 
+const fs = require('fs');
+
+// Use persistent disk on Render
+const uploadsDir = process.env.RENDER
+  ? '/opt/render/project/src/data/uploads'
+  : path.join(__dirname, 'uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
+
 // Multer config
 const storage = multer.diskStorage({
-  destination: path.join(__dirname, 'uploads'),
+  destination: uploadsDir,
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `${uuidv4()}${ext}`);
   },
 });
-
-const fs = require('fs');
-fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
 
 const upload = multer({
   storage,
@@ -71,7 +76,7 @@ router.post('/thumbnails', requireAdmin, upload.array('files', 50), (req, res) =
 router.delete('/thumbnails/:id', requireAdmin, (req, res) => {
   const thumb = db.prepare('SELECT filename FROM thumbnails WHERE id = ?').get(req.params.id);
   if (thumb) {
-    const filepath = path.join(__dirname, 'uploads', thumb.filename);
+    const filepath = path.join(uploadsDir, thumb.filename);
     try { fs.unlinkSync(filepath); } catch {}
     db.prepare('DELETE FROM memory_tests WHERE thumbnail_id = ?').run(req.params.id);
     db.prepare('DELETE FROM mouse_tracking WHERE duel_id IN (SELECT id FROM duels WHERE thumb_left_id = ? OR thumb_right_id = ?)').run(req.params.id, req.params.id);

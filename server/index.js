@@ -9,8 +9,13 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Serve uploaded images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploaded images (persistent disk on Render)
+const uploadsDir = process.env.RENDER
+  ? '/opt/render/project/src/data/uploads'
+  : path.join(__dirname, 'uploads');
+const fs = require('fs');
+fs.mkdirSync(uploadsDir, { recursive: true });
+app.use('/uploads', express.static(uploadsDir));
 
 // API routes
 app.use('/api', apiRouter);

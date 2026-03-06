@@ -1,11 +1,13 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const dbPath = path.join(__dirname, 'data', 'arena.db');
-
-// Ensure data directory exists
 const fs = require('fs');
-fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+
+// Use persistent disk on Render, local folder otherwise
+const dataDir = process.env.RENDER ? '/opt/render/project/src/data' : path.join(__dirname, 'data');
+fs.mkdirSync(dataDir, { recursive: true });
+
+const dbPath = path.join(dataDir, 'arena.db');
 
 const db = new Database(dbPath);
 
