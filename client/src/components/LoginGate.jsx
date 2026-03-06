@@ -6,71 +6,73 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 56px)',
+    minHeight: 'calc(100vh - 64px)',
     padding: '24px',
-    animation: 'fadeIn 0.3s ease-out',
+    animation: 'bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
   },
   card: {
     background: 'var(--bg-card)',
-    border: '1px solid var(--border)',
-    borderRadius: '16px',
+    border: '3px solid var(--border)',
+    borderRadius: '24px',
     padding: '48px 40px',
-    maxWidth: '380px',
+    maxWidth: '400px',
     width: '100%',
     textAlign: 'center',
     boxShadow: 'var(--shadow-lg)',
   },
-  icon: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '12px',
-    background: 'var(--accent-light)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 20px',
+  emoji: {
+    fontSize: '3.5rem',
+    marginBottom: '16px',
+    display: 'block',
+    animation: 'float 3s ease-in-out infinite',
   },
   title: {
-    fontSize: '1.3rem',
+    fontFamily: 'var(--font-title)',
+    fontSize: '1.5rem',
+    fontWeight: 700,
     marginBottom: '6px',
     color: 'var(--text-primary)',
   },
   subtitle: {
-    fontSize: '0.85rem',
+    fontSize: '0.9rem',
     color: 'var(--text-muted)',
     marginBottom: '28px',
+    fontWeight: 500,
   },
   input: {
     width: '100%',
-    padding: '12px 16px',
+    padding: '14px 18px',
     background: 'var(--bg-secondary)',
-    border: '1px solid var(--border)',
-    borderRadius: '10px',
+    border: '3px solid var(--border)',
+    borderRadius: '14px',
     color: 'var(--text-primary)',
-    fontSize: '0.95rem',
-    marginBottom: '14px',
+    fontSize: '1rem',
+    marginBottom: '16px',
     outline: 'none',
     transition: 'border-color 0.2s, box-shadow 0.2s',
     fontFamily: 'var(--font-body)',
+    fontWeight: 600,
   },
   button: {
     width: '100%',
-    padding: '12px',
-    background: 'var(--accent)',
+    padding: '14px',
+    background: 'var(--gradient-fun)',
     color: 'white',
-    fontSize: '0.95rem',
-    fontWeight: 600,
-    borderRadius: '10px',
-    boxShadow: 'var(--shadow-sm)',
+    fontSize: '1.05rem',
+    fontWeight: 700,
+    borderRadius: '14px',
+    boxShadow: '0 4px 0 rgba(200, 80, 20, 0.3)',
+    letterSpacing: '0.02em',
   },
   error: {
     color: 'var(--red)',
-    fontSize: '0.8rem',
-    marginTop: '14px',
-    fontWeight: 500,
+    fontSize: '0.85rem',
+    marginTop: '16px',
+    fontWeight: 600,
     background: 'var(--red-light)',
-    padding: '8px 14px',
-    borderRadius: '8px',
+    padding: '10px 16px',
+    borderRadius: '12px',
+    border: '2px solid rgba(239, 68, 68, 0.15)',
   },
 };
 
@@ -88,7 +90,7 @@ export default function LoginGate({ auth, children }) {
     try {
       await auth.login(pw);
     } catch {
-      setError('Mot de passe incorrect');
+      setError('Oups ! Mauvais mot de passe 😅');
     } finally {
       setLoading(false);
     }
@@ -97,26 +99,21 @@ export default function LoginGate({ auth, children }) {
   return (
     <div style={styles.container}>
       <form style={styles.card} onSubmit={handleSubmit}>
-        <div style={styles.icon}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-        </div>
-        <h2 style={styles.title}>Acces protege</h2>
-        <p style={styles.subtitle}>Entrez le mot de passe pour continuer</p>
+        <span style={styles.emoji}>🔐</span>
+        <h2 style={styles.title}>Zone secrete !</h2>
+        <p style={styles.subtitle}>Entre le mot de passe pour acceder</p>
         <input
           style={styles.input}
           type="password"
           value={pw}
           onChange={(e) => setPw(e.target.value)}
-          placeholder="Mot de passe"
+          placeholder="🤫 Mot de passe..."
           autoFocus
-          onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 3px var(--accent-light)'; }}
+          onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 4px var(--accent-light)'; }}
           onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
         />
         <button style={styles.button} type="submit" disabled={loading}>
-          {loading ? 'Verification...' : 'Continuer'}
+          {loading ? '⏳ Verification...' : '🚀 Entrer'}
         </button>
         {error && <p style={styles.error}>{error}</p>}
       </form>

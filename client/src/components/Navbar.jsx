@@ -6,69 +6,87 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '56px',
-    background: 'rgba(255, 255, 255, 0.8)',
+    height: '64px',
+    background: 'rgba(255, 248, 240, 0.85)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    borderBottom: '1px solid var(--border)',
+    borderBottom: '3px solid var(--border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 24px',
     zIndex: 1000,
   },
+  logoWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  logoEmoji: {
+    fontSize: '1.6rem',
+    animation: 'wiggle 2s ease-in-out infinite',
+  },
   logo: {
     fontFamily: 'var(--font-title)',
-    fontSize: '0.85rem',
-    fontWeight: 800,
+    fontSize: '1.15rem',
+    fontWeight: 700,
     color: 'var(--text-primary)',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
+    letterSpacing: '-0.01em',
+  },
+  logoAccent: {
+    color: 'var(--accent)',
   },
   links: {
     display: 'flex',
-    gap: '4px',
+    gap: '6px',
   },
   link: {
     fontFamily: 'var(--font-title)',
-    fontSize: '0.85rem',
+    fontSize: '0.9rem',
     fontWeight: 500,
-    padding: '6px 14px',
-    borderRadius: '8px',
+    padding: '8px 16px',
+    borderRadius: '12px',
     color: 'var(--text-muted)',
     textDecoration: 'none',
-    transition: 'all 0.15s ease',
-    border: 'none',
+    transition: 'all 0.2s ease',
+    border: '2px solid transparent',
   },
   activeLink: {
     color: 'var(--accent)',
     background: 'var(--accent-light)',
     fontWeight: 600,
+    border: '2px solid var(--accent)',
+    boxShadow: '0 2px 0 rgba(255, 107, 53, 0.15)',
   },
 };
 
 export default function Navbar() {
   return (
     <nav style={styles.nav}>
-      <div style={styles.logo}>Thumbnail Arena</div>
+      <div style={styles.logoWrap}>
+        <span style={styles.logoEmoji}>🏆</span>
+        <span style={styles.logo}>
+          Thumbnail <span style={styles.logoAccent}>Arena</span>
+        </span>
+      </div>
       <div style={styles.links}>
         <NavLink
           to="/"
           style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.activeLink : {}) })}
         >
-          Tester
+          🎮 Tester
         </NavLink>
         <NavLink
           to="/admin"
           style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.activeLink : {}) })}
         >
-          Back Office
+          ⚙️ Admin
         </NavLink>
         <NavLink
           to="/results"
           style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.activeLink : {}) })}
         >
-          Resultats
+          📊 Resultats
         </NavLink>
       </div>
     </nav>
