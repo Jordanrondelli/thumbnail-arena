@@ -96,15 +96,15 @@ function ResultsContent({ password }) {
                   <div style={styles.heroMedal}>🏆</div>
                   <h2 style={styles.heroTitle}>Miniature gagnante</h2>
                   <div style={styles.heroScore}>{formatScore(winner.compositeScore)}<span style={styles.heroScoreUnit}>/100</span></div>
+                  <p style={styles.heroPhrase}>
+                    Gagne {Math.round(winner.winRate * 100)}% de ses duels. Clics en {winner.avgReactionMs}ms en moyenne.
+                  </p>
                   <div style={styles.heroStats}>
                     <div style={styles.heroPill}>
                       <span>🎯</span> {Math.round(winner.winRate * 100)}% wins
                     </div>
                     <div style={styles.heroPill}>
                       <span>⚡</span> {winner.avgReactionMs}ms
-                    </div>
-                    <div style={styles.heroPill}>
-                      <span>🧠</span> {Math.round(winner.memoryScore * 100)}% memo
                     </div>
                   </div>
                 </div>
@@ -290,11 +290,10 @@ function ResultCard({ result, rank, index }) {
         <div style={styles.metricsRow}>
           <MetricPill label="Win Rate" value={`${Math.round(r.winRate * 100)}%`} emoji="🎯" />
           <MetricPill label="Vitesse" value={`${formatScore(r.speedNorm)}`} sub="/100" emoji="⚡" />
-          <MetricPill label="Memoire" value={`${formatScore(r.memoryScore)}`} sub="/100" emoji="🧠" />
         </div>
 
         <div style={styles.radarRow}>
-          <RadarChart winRate={r.winRate} speed={r.speedNorm} memory={r.memoryScore} />
+          <RadarChart winRate={r.winRate} speed={r.speedNorm} />
         </div>
 
         <div style={styles.detailsRow}>
@@ -448,6 +447,15 @@ const styles = {
     fontSize: '1.3rem',
     color: 'var(--text-muted)',
     fontWeight: 500,
+  },
+  heroPhrase: {
+    fontFamily: 'var(--font-body)',
+    fontSize: '0.95rem',
+    color: 'var(--text-secondary)',
+    fontWeight: 600,
+    marginTop: '10px',
+    marginBottom: '0',
+    lineHeight: 1.5,
   },
   heroStats: {
     display: 'flex',

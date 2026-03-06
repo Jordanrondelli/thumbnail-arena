@@ -93,15 +93,6 @@ export async function submitDuels(sessionId, duels) {
   return res.json();
 }
 
-export async function submitMemory(sessionId, recognized) {
-  const res = await fetch(`${BASE}/session/${sessionId}/memory`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({ recognized }),
-  });
-  return res.json();
-}
-
 export async function getResults(password) {
   const res = await fetch(`${BASE}/results`, { headers: headers(password) });
   if (!res.ok) throw new Error('Erreur');

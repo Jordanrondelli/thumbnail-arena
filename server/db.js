@@ -58,18 +58,9 @@ db.exec(`
     data TEXT NOT NULL
   );
 
-  CREATE TABLE IF NOT EXISTS memory_tests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT NOT NULL REFERENCES sessions(id),
-    thumbnail_id TEXT NOT NULL REFERENCES thumbnails(id),
-    was_recognized INTEGER NOT NULL DEFAULT 0
-  );
-
   CREATE INDEX IF NOT EXISTS idx_duels_session ON duels(session_id);
   CREATE INDEX IF NOT EXISTS idx_duels_winner ON duels(winner_id);
   CREATE INDEX IF NOT EXISTS idx_duels_thumbs ON duels(thumb_left_id, thumb_right_id);
-  CREATE INDEX IF NOT EXISTS idx_memory_session ON memory_tests(session_id);
-  CREATE INDEX IF NOT EXISTS idx_memory_thumb ON memory_tests(thumbnail_id);
 
   CREATE TABLE IF NOT EXISTS click_heatmap (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

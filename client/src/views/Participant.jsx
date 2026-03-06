@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getSessionPairs, submitDuels, submitMemory, submitClicks } from '../utils/api';
+import { getSessionPairs, submitDuels, submitClicks } from '../utils/api';
 
 // --- Step Intro ---
 function StepIntro({ onStart }) {
@@ -176,170 +176,6 @@ function StepDuel({ pairs, onComplete }) {
   );
 }
 
-// --- Step Distractor ---
-function StepDistractor({ onComplete }) {
-  const [countdown, setCountdown] = useState(5);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 1) {
-          clearInterval(interval);
-          onComplete();
-          return 0;
-        }
-        return c - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [onComplete]);
-
-  const colors = [
-    { bg: '#FF6B6B', emoji: '🍎' },
-    { bg: '#4ECDC4', emoji: '🐸' },
-    { bg: '#FFE66D', emoji: '⭐' },
-    { bg: '#A78BFA', emoji: '🔮' },
-    { bg: '#FB923C', emoji: '🍊' },
-    { bg: '#60A5FA', emoji: '💎' },
-    { bg: '#F472B6', emoji: '🌸' },
-    { bg: '#34D399', emoji: '🍀' },
-  ];
-
-  return (
-    <div style={stepStyles.center} className="fade-in">
-      <div style={{ fontSize: '2rem', marginBottom: '8px', animation: 'wiggle 1s ease-in-out infinite' }}>🧠</div>
-      <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '20px', fontFamily: 'var(--font-title)', fontWeight: 500 }}>
-        Petite pause... regarde ces jolies couleurs !
-      </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', maxWidth: '340px', margin: '0 auto 28px' }}>
-        {colors.map((c, i) => (
-          <div key={i} style={{
-            background: c.bg,
-            borderRadius: '16px',
-            aspectRatio: '1',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.8rem',
-            boxShadow: `0 4px 0 ${c.bg}88`,
-            animation: `bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 0.05}s both`,
-          }}>
-            {c.emoji}
-          </div>
-        ))}
-      </div>
-      <div style={{
-        fontFamily: 'var(--font-title)',
-        fontSize: '3.5rem',
-        fontWeight: 700,
-        background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        animation: 'pulse 1s ease-in-out infinite',
-      }}>
-        {countdown}
-      </div>
-    </div>
-  );
-}
-
-// --- Step Memory ---
-function StepMemory({ thumbnails, onComplete }) {
-  const [selected, setSelected] = useState(new Set());
-  const distractorColors = [
-    { bg: '#FF6B6B', emoji: '🍎' },
-    { bg: '#4ECDC4', emoji: '🐸' },
-    { bg: '#FFE66D', emoji: '⭐' },
-    { bg: '#A78BFA', emoji: '🔮' },
-    { bg: '#FB923C', emoji: '🍊' },
-    { bg: '#60A5FA', emoji: '💎' },
-    { bg: '#F472B6', emoji: '🌸' },
-    { bg: '#34D399', emoji: '🍀' },
-  ];
-
-  const items = [
-    ...thumbnails.map((t) => ({ type: 'thumb', ...t })),
-    ...distractorColors.map((c, i) => ({ type: 'color', id: `color-${i}`, ...c })),
-  ].sort(() => Math.random() - 0.5);
-
-  const toggle = (id) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  };
-
-  const handleValidate = () => {
-    const recognized = [...selected].filter((id) => !id.startsWith('color-'));
-    onComplete(recognized);
-  };
-
-  return (
-    <div style={stepStyles.center} className="fade-in">
-      <div style={{ fontSize: '2.5rem', marginBottom: '8px', animation: 'float 2s ease-in-out infinite' }}>🧩</div>
-      <h2 style={{
-        fontFamily: 'var(--font-title)',
-        fontSize: '1.5rem',
-        background: 'linear-gradient(135deg, var(--purple), var(--pink))',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        marginBottom: '8px',
-      }}>
-        Test de memorisation
-      </h2>
-      <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '24px', fontWeight: 600 }}>
-        Clique sur les miniatures que tu as vues pendant les duels
-      </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', maxWidth: '620px', margin: '0 auto 28px' }}>
-        {items.map((item, i) => (
-          <button
-            key={item.id}
-            onClick={() => toggle(item.id)}
-            style={{
-              border: selected.has(item.id) ? '4px solid var(--purple)' : '4px solid var(--border)',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              cursor: 'pointer',
-              background: item.type === 'color' ? item.bg : 'var(--bg-card)',
-              aspectRatio: '16/9',
-              padding: 0,
-              boxShadow: selected.has(item.id) ? '0 0 20px var(--purple-light), 0 4px 0 rgba(139, 92, 246, 0.3)' : 'var(--shadow-sm)',
-              transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              animation: `slideUp 0.3s ease-out ${i * 0.03}s both`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.5rem',
-              position: 'relative',
-            }}
-          >
-            {item.type === 'thumb' ? (
-              <img src={`/uploads/${item.filename}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            ) : (
-              <span>{item.emoji}</span>
-            )}
-            {selected.has(item.id) && (
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'rgba(139, 92, 246, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-              }}>
-                &#10003;
-              </div>
-            )}
-          </button>
-        ))}
-      </div>
-      <button style={stepStyles.startBtn} onClick={handleValidate}>Valider</button>
-    </div>
-  );
-}
-
 // --- Step Eye Tracking (Heatmap) ---
 function StepEyeTrack({ thumbnails, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -397,7 +233,6 @@ function StepEyeTrack({ thumbnails, onComplete }) {
       clickTimeMs: clickTime,
     }]);
 
-    // Visual ripple feedback
     setRipples((prev) => [...prev, { id: Date.now(), x: xPct, y: yPct }]);
   };
 
@@ -439,7 +274,6 @@ function StepEyeTrack({ thumbnails, onComplete }) {
           }}
           draggable={false}
         />
-        {/* Ripple feedback */}
         {ripples.map((r) => (
           <div key={r.id} style={{
             position: 'absolute',
@@ -523,21 +357,10 @@ export default function Participant() {
   const handleDuelsComplete = async (duelResults) => {
     try {
       await submitDuels(sessionData.sessionId, duelResults);
-      setStep('distractor');
+      setStep('eyetrack');
     } catch {
       setStep('thanks');
     }
-  };
-
-  const handleDistractorComplete = useCallback(() => {
-    setStep('memory');
-  }, []);
-
-  const handleMemoryComplete = async (recognized) => {
-    try {
-      await submitMemory(sessionData.sessionId, recognized);
-    } catch {}
-    setStep('eyetrack');
   };
 
   const handleEyeTrackComplete = async (clicksData) => {
@@ -582,8 +405,6 @@ export default function Participant() {
 
   if (step === 'intro') return <StepIntro onStart={() => setStep('duels')} />;
   if (step === 'duels') return <StepDuel pairs={sessionData.pairs} onComplete={handleDuelsComplete} />;
-  if (step === 'distractor') return <StepDistractor onComplete={handleDistractorComplete} />;
-  if (step === 'memory') return <StepMemory thumbnails={sessionData.thumbnails} onComplete={handleMemoryComplete} />;
   if (step === 'eyetrack') return <StepEyeTrack thumbnails={sessionData.thumbnails} onComplete={handleEyeTrackComplete} />;
   if (step === 'thanks') return <StepThanks />;
 

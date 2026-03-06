@@ -4,8 +4,7 @@ const RADIUS = 52;
 
 const AXES = [
   { label: 'Win Rate', angle: -90 },
-  { label: 'Vitesse', angle: 30 },
-  { label: 'Memoire', angle: 150 },
+  { label: 'Vitesse', angle: 90 },
 ];
 
 function polarToCart(angleDeg, r) {
@@ -16,8 +15,8 @@ function polarToCart(angleDeg, r) {
   };
 }
 
-export default function RadarChart({ winRate, speed, memory }) {
-  const values = [winRate, speed, memory];
+export default function RadarChart({ winRate, speed }) {
+  const values = [winRate, speed];
 
   const gridLevels = [0.25, 0.5, 0.75, 1];
 
@@ -30,12 +29,18 @@ export default function RadarChart({ winRate, speed, memory }) {
 
   return (
     <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
-      {/* Grid */}
-      {gridLevels.map((level) => {
-        const pts = AXES.map((axis) => polarToCart(axis.angle, RADIUS * level));
-        const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ') + ' Z';
-        return <path key={level} d={path} fill="none" stroke="rgba(139, 92, 246, 0.1)" strokeWidth="1.5" />;
-      })}
+      {/* Grid circles */}
+      {gridLevels.map((level) => (
+        <circle
+          key={level}
+          cx={CENTER}
+          cy={CENTER}
+          r={RADIUS * level}
+          fill="none"
+          stroke="rgba(139, 92, 246, 0.1)"
+          strokeWidth="1.5"
+        />
+      ))}
 
       {/* Axis lines */}
       {AXES.map((axis, i) => {

@@ -79,7 +79,6 @@ router.delete('/thumbnails/:id', requireAdmin, (req, res) => {
     const filepath = path.join(uploadsDir, thumb.filename);
     try { fs.unlinkSync(filepath); } catch {}
     db.prepare('DELETE FROM click_heatmap WHERE thumbnail_id = ?').run(req.params.id);
-    db.prepare('DELETE FROM memory_tests WHERE thumbnail_id = ?').run(req.params.id);
     db.prepare('DELETE FROM mouse_tracking WHERE duel_id IN (SELECT id FROM duels WHERE thumb_left_id = ? OR thumb_right_id = ?)').run(req.params.id, req.params.id);
     db.prepare('DELETE FROM duels WHERE thumb_left_id = ? OR thumb_right_id = ?').run(req.params.id, req.params.id);
     db.prepare('DELETE FROM thumbnails WHERE id = ?').run(req.params.id);
@@ -110,7 +109,6 @@ router.post('/config/deactivate', requireAdmin, (req, res) => {
 router.post('/config/reset', requireAdmin, (req, res) => {
   db.prepare('DELETE FROM click_heatmap').run();
   db.prepare('DELETE FROM mouse_tracking').run();
-  db.prepare('DELETE FROM memory_tests').run();
   db.prepare('DELETE FROM duels').run();
   db.prepare('DELETE FROM sessions').run();
   res.json({ ok: true });
@@ -232,32 +230,6 @@ router.post('/session/:id/duels', (req, res) => {
   res.json({ ok: true, median, isValid });
 });
 
-router.post('/session/:id/memory', (req, res) => {
-  const { recognized } = req.body; // array of thumbnail ids recognized
-  const sessionId = req.params.id;
-
-  // Get all thumbnails that were shown in this session's duels
-  const shown = db.prepare(`
-    SELECT DISTINCT t.id FROM thumbnails t
-    WHERE t.id IN (
-      SELECT thumb_left_id FROM duels WHERE session_id = ?
-      UNION
-      SELECT thumb_right_id FROM duels WHERE session_id = ?
-    )
-  `).all(sessionId, sessionId);
-
-  const insert = db.prepare('INSERT INTO memory_tests (session_id, thumbnail_id, was_recognized) VALUES (?, ?, ?)');
-  const insertAll = db.transaction(() => {
-    for (const thumb of shown) {
-      const wasRecognized = recognized.includes(thumb.id) ? 1 : 0;
-      insert.run(sessionId, thumb.id, wasRecognized);
-    }
-  });
-  insertAll();
-
-  res.json({ ok: true });
-});
-
 // --- Click heatmap ---
 router.post('/session/:id/clicks', (req, res) => {
   const { clicks } = req.body; // array of { thumbnailId, xPct, yPct, clickTimeMs }
@@ -316,23 +288,8 @@ router.get('/results', requireAdmin, (req, res) => {
 
     const speedNorm = Math.max(0, Math.min(1, (2800 - avgReaction) / (2800 - 500)));
 
-    // Memory score
-    const memoryTotal = db.prepare(`
-      SELECT COUNT(*) as c FROM memory_tests m
-      JOIN sessions s ON m.session_id = s.id
-      WHERE s.is_valid = 1 AND m.thumbnail_id = ?
-    `).get(thumb.id).c;
-
-    const memoryRecognized = db.prepare(`
-      SELECT COUNT(*) as c FROM memory_tests m
-      JOIN sessions s ON m.session_id = s.id
-      WHERE s.is_valid = 1 AND m.thumbnail_id = ? AND m.was_recognized = 1
-    `).get(thumb.id).c;
-
-    const memoryScore = memoryTotal > 0 ? memoryRecognized / memoryTotal : 0;
-
-    // Composite score
-    const compositeScore = winRate * 0.50 + speedNorm * 0.35 + memoryScore * 0.15;
+    // Composite score: Win Rate 60% + Speed 40%
+    const compositeScore = winRate * 0.60 + speedNorm * 0.40;
 
     results.push({
       id: thumb.id,
@@ -343,9 +300,6 @@ router.get('/results', requireAdmin, (req, res) => {
       winRate,
       avgReactionMs: Math.round(avgReaction),
       speedNorm,
-      memoryScore,
-      memoryTotal,
-      memoryRecognized,
       compositeScore,
     });
   }
