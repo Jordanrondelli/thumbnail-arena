@@ -1,41 +1,73 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getSessionPairs, submitDuels, submitClicks } from '../utils/api';
 
-// --- Step Intro ---
-function StepIntro({ onStart }) {
+// --- Step Welcome (new home screen) ---
+function StepWelcome({ onReady }) {
   return (
     <div style={stepStyles.center} className="fade-in">
       <div style={{ fontSize: '4rem', marginBottom: '16px', animation: 'float 2s ease-in-out infinite', display: 'inline-block' }}>🎮</div>
       <h1 style={stepStyles.introTitle}>Thumbnail Arena</h1>
       <div style={stepStyles.introCard}>
         <p style={stepStyles.introText}>
-          Tu vas voir des paires de miniatures. Clique sur celle qui attirerait ton attention dans un vrai feed YouTube.
+          Tu vas participer a <strong>2 tests differents</strong> pour m'aider a choisir la meilleure miniature de video.
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '8px' }}>
+          <div style={stepStyles.testBadge}>
+            <span style={{ fontSize: '1.3rem' }}>⚔️</span>
+            <span>Test 1 : Duels</span>
+          </div>
+          <div style={stepStyles.testBadge}>
+            <span style={{ fontSize: '1.3rem' }}>👁️</span>
+            <span>Test 2 : Regard</span>
+          </div>
+        </div>
+      </div>
+      <button style={stepStyles.startBtn} onClick={onReady}>
+        Je suis pret
+      </button>
+    </div>
+  );
+}
+
+// --- Step Intro Test 1 (Duels) ---
+function StepIntroTest1({ onStart }) {
+  return (
+    <div style={stepStyles.center} className="fade-in">
+      <div style={{ fontSize: '3rem', marginBottom: '12px' }}>⚔️</div>
+      <h2 style={{ ...stepStyles.introTitle, fontSize: '2rem' }}>Test 1 : Duels</h2>
+      <div style={stepStyles.introCard}>
+        <p style={stepStyles.introText}>
+          Tu vas voir des paires de miniatures. Clique sur celle qui attirerait ton attention.
         </p>
         <div style={stepStyles.timerBadge}>
           <span style={{ fontSize: '1.5rem' }}>⏱</span>
-          <span><strong>1,5 seconde</strong> par choix</span>
+          <span><strong>2,5 secondes</strong> pour choisir</span>
         </div>
         <p style={{ ...stepStyles.introText, fontSize: '0.95rem', color: 'var(--text-muted)' }}>
-          Fais confiance a ton instinct !
+          Clique sur celle qui t'attire instinctivement !
         </p>
       </div>
       <button style={stepStyles.startBtn} onClick={onStart}>
-        C'est parti !
+        Commencer
       </button>
     </div>
   );
 }
 
 // --- Step Duel ---
+const DUEL_DURATION = 2500;
+
 function StepDuel({ pairs, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(1500);
+  const [timeLeft, setTimeLeft] = useState(DUEL_DURATION);
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [waiting, setWaiting] = useState(false);
   const startTimeRef = useRef(Date.now());
   const trackingRef = useRef([]);
   const timerRef = useRef(null);
   const trackIntervalRef = useRef(null);
+  const pendingResultRef = useRef(null);
 
   const pair = pairs[currentIndex];
 
@@ -46,8 +78,8 @@ function StepDuel({ pairs, onComplete }) {
     }
   };
 
-  const nextDuel = useCallback((result) => {
-    stopTracking();
+  const goToNext = () => {
+    const result = pendingResultRef.current;
     const newResults = [...results, result];
     if (currentIndex + 1 >= pairs.length) {
       onComplete(newResults);
@@ -55,25 +87,28 @@ function StepDuel({ pairs, onComplete }) {
       setResults(newResults);
       setCurrentIndex(currentIndex + 1);
       setSelected(null);
-      setTimeLeft(1500);
+      setWaiting(false);
+      setTimeLeft(DUEL_DURATION);
       startTimeRef.current = Date.now();
       trackingRef.current = [];
     }
-  }, [results, currentIndex, pairs, onComplete]);
+  };
 
   useEffect(() => {
+    if (waiting) return;
     startTimeRef.current = Date.now();
     trackingRef.current = [];
-    setTimeLeft(1500);
+    setTimeLeft(DUEL_DURATION);
     setSelected(null);
 
     timerRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
-      const remaining = Math.max(0, 1500 - elapsed);
+      const remaining = Math.max(0, DUEL_DURATION - elapsed);
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(timerRef.current);
-        nextDuel({
+        stopTracking();
+        pendingResultRef.current = {
           thumbLeftId: pair.left.id,
           thumbRightId: pair.right.id,
           winnerId: null,
@@ -81,14 +116,16 @@ function StepDuel({ pairs, onComplete }) {
           positionOrder: currentIndex,
           timedOut: true,
           trackingData: trackingRef.current,
-        });
+        };
+        setWaiting(true);
       }
     }, 30);
 
     return () => clearInterval(timerRef.current);
-  }, [currentIndex, pair]);
+  }, [currentIndex, waiting]);
 
   useEffect(() => {
+    if (waiting) return;
     const handler = (e) => {
       const x = e.clientX ?? e.touches?.[0]?.clientX;
       const y = e.clientY ?? e.touches?.[0]?.clientY;
@@ -106,28 +143,51 @@ function StepDuel({ pairs, onComplete }) {
       window.removeEventListener('touchmove', handler);
       stopTracking();
     };
-  }, [currentIndex]);
+  }, [currentIndex, waiting]);
 
   const handleClick = (winnerId) => {
-    if (selected) return;
+    if (selected || waiting) return;
     clearInterval(timerRef.current);
+    stopTracking();
     setSelected(winnerId);
     const reactionTime = Date.now() - startTimeRef.current;
 
-    setTimeout(() => {
-      nextDuel({
-        thumbLeftId: pair.left.id,
-        thumbRightId: pair.right.id,
-        winnerId,
-        reactionTimeMs: reactionTime,
-        positionOrder: currentIndex,
-        timedOut: false,
-        trackingData: trackingRef.current,
-      });
-    }, 250);
+    pendingResultRef.current = {
+      thumbLeftId: pair.left.id,
+      thumbRightId: pair.right.id,
+      winnerId,
+      reactionTimeMs: reactionTime,
+      positionOrder: currentIndex,
+      timedOut: false,
+      trackingData: trackingRef.current,
+    };
+    setWaiting(true);
   };
 
-  const progress = timeLeft / 1500;
+  // Waiting screen between duels
+  if (waiting) {
+    return (
+      <div style={stepStyles.center} className="fade-in">
+        <div style={duelStyles.counter}>
+          <span style={duelStyles.counterCurrent}>{currentIndex + 1}</span>
+          <span style={duelStyles.counterTotal}> / {pairs.length}</span>
+        </div>
+        {selected ? (
+          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
+        ) : (
+          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⏰</div>
+        )}
+        <p style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '1.05rem', marginBottom: '8px' }}>
+          {selected ? 'Choix enregistre !' : 'Temps ecoule !'}
+        </p>
+        <button style={stepStyles.startBtn} onClick={goToNext}>
+          Passer au duel suivant
+        </button>
+      </div>
+    );
+  }
+
+  const progress = timeLeft / DUEL_DURATION;
   const barColor = progress > 0.5
     ? 'linear-gradient(90deg, var(--green), #34D399)'
     : progress > 0.2
@@ -176,18 +236,45 @@ function StepDuel({ pairs, onComplete }) {
   );
 }
 
+// --- Step Intro Test 2 (Heatmap) ---
+function StepIntroTest2({ onStart }) {
+  return (
+    <div style={stepStyles.center} className="fade-in">
+      <div style={{ fontSize: '3rem', marginBottom: '12px' }}>👁️</div>
+      <h2 style={{ ...stepStyles.introTitle, fontSize: '2rem' }}>Test 2 : Regard</h2>
+      <div style={stepStyles.introCard}>
+        <p style={stepStyles.introText}>
+          Une miniature va s'afficher. Clique ou tape sur l'endroit ou ton regard est naturellement attire.
+        </p>
+        <div style={stepStyles.timerBadge}>
+          <span style={{ fontSize: '1.5rem' }}>⏱</span>
+          <span><strong>5 secondes</strong> par miniature</span>
+        </div>
+        <p style={{ ...stepStyles.introText, fontSize: '0.95rem', color: 'var(--text-muted)' }}>
+          C'est instinctif, ne reflechis pas trop !
+        </p>
+      </div>
+      <button style={stepStyles.startBtn} onClick={onStart}>
+        Commencer
+      </button>
+    </div>
+  );
+}
+
 // --- Step Eye Tracking (Heatmap) ---
 function StepEyeTrack({ thumbnails, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(5000);
   const [clicks, setClicks] = useState([]);
   const [ripples, setRipples] = useState([]);
+  const [waiting, setWaiting] = useState(false);
+  const [hasClicked, setHasClicked] = useState(false);
   const startTimeRef = useRef(Date.now());
   const timerRef = useRef(null);
   const imgRef = useRef(null);
   const thumb = thumbnails[currentIndex];
 
-  const advance = useCallback(() => {
+  const goToNext = () => {
     if (currentIndex + 1 >= thumbnails.length) {
       onComplete(clicks);
     } else {
@@ -195,13 +282,17 @@ function StepEyeTrack({ thumbnails, onComplete }) {
       setTimeLeft(5000);
       startTimeRef.current = Date.now();
       setRipples([]);
+      setWaiting(false);
+      setHasClicked(false);
     }
-  }, [currentIndex, thumbnails, clicks, onComplete]);
+  };
 
   useEffect(() => {
+    if (waiting) return;
     startTimeRef.current = Date.now();
     setTimeLeft(5000);
     setRipples([]);
+    setHasClicked(false);
 
     timerRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
@@ -209,14 +300,15 @@ function StepEyeTrack({ thumbnails, onComplete }) {
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(timerRef.current);
-        advance();
+        setWaiting(true);
       }
     }, 30);
 
     return () => clearInterval(timerRef.current);
-  }, [currentIndex]);
+  }, [currentIndex, waiting]);
 
   const handleClick = (e) => {
+    if (waiting) return;
     const rect = imgRef.current.getBoundingClientRect();
     const x = (e.clientX ?? e.touches?.[0]?.clientX) - rect.left;
     const y = (e.clientY ?? e.touches?.[0]?.clientY) - rect.top;
@@ -234,7 +326,36 @@ function StepEyeTrack({ thumbnails, onComplete }) {
     }]);
 
     setRipples((prev) => [...prev, { id: Date.now(), x: xPct, y: yPct }]);
+
+    if (!hasClicked) {
+      setHasClicked(true);
+      clearInterval(timerRef.current);
+      setWaiting(true);
+    }
   };
+
+  // Waiting screen between thumbnails
+  if (waiting) {
+    return (
+      <div style={stepStyles.center} className="fade-in">
+        <div style={eyeStyles.counter}>
+          <span style={eyeStyles.counterCurrent}>{currentIndex + 1}</span>
+          <span style={eyeStyles.counterTotal}> / {thumbnails.length}</span>
+        </div>
+        {hasClicked ? (
+          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
+        ) : (
+          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⏰</div>
+        )}
+        <p style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '1.05rem', marginBottom: '8px' }}>
+          {hasClicked ? 'Clic enregistre !' : 'Temps ecoule !'}
+        </p>
+        <button style={stepStyles.startBtn} onClick={goToNext}>
+          Passer a la prochaine miniature
+        </button>
+      </div>
+    );
+  }
 
   const progress = timeLeft / 5000;
   const barColor = progress > 0.5
@@ -291,10 +412,6 @@ function StepEyeTrack({ thumbnails, onComplete }) {
           }} />
         ))}
       </div>
-
-      <div style={eyeStyles.hint}>
-        <span>👆</span> Tu peux cliquer plusieurs fois !
-      </div>
     </div>
   );
 }
@@ -347,7 +464,7 @@ export default function Participant() {
     try {
       const data = await getSessionPairs();
       setSessionData(data);
-      setStep('intro');
+      setStep('welcome');
     } catch (e) {
       setError(e.message);
       setStep('error');
@@ -357,9 +474,9 @@ export default function Participant() {
   const handleDuelsComplete = async (duelResults) => {
     try {
       await submitDuels(sessionData.sessionId, duelResults);
-      setStep('eyetrack');
+      setStep('intro-test2');
     } catch {
-      setStep('thanks');
+      setStep('intro-test2');
     }
   };
 
@@ -403,8 +520,10 @@ export default function Participant() {
     );
   }
 
-  if (step === 'intro') return <StepIntro onStart={() => setStep('duels')} />;
+  if (step === 'welcome') return <StepWelcome onReady={() => setStep('intro-test1')} />;
+  if (step === 'intro-test1') return <StepIntroTest1 onStart={() => setStep('duels')} />;
   if (step === 'duels') return <StepDuel pairs={sessionData.pairs} onComplete={handleDuelsComplete} />;
+  if (step === 'intro-test2') return <StepIntroTest2 onStart={() => setStep('eyetrack')} />;
   if (step === 'eyetrack') return <StepEyeTrack thumbnails={sessionData.thumbnails} onComplete={handleEyeTrackComplete} />;
   if (step === 'thanks') return <StepThanks />;
 
@@ -459,6 +578,19 @@ const stepStyles = {
     fontFamily: 'var(--font-title)',
     fontSize: '1rem',
     color: 'var(--purple)',
+  },
+  testBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    background: 'var(--bg-secondary)',
+    padding: '10px 16px',
+    borderRadius: '14px',
+    fontFamily: 'var(--font-title)',
+    fontSize: '0.9rem',
+    color: 'var(--text-secondary)',
+    fontWeight: 600,
+    border: '2px solid var(--border)',
   },
   startBtn: {
     marginTop: '24px',
@@ -660,18 +792,5 @@ const eyeStyles = {
     userSelect: 'none',
     WebkitUserSelect: 'none',
     pointerEvents: 'auto',
-  },
-  hint: {
-    marginTop: '16px',
-    fontSize: '0.9rem',
-    color: 'var(--text-muted)',
-    fontWeight: 600,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    background: 'var(--bg-card)',
-    padding: '8px 18px',
-    borderRadius: '12px',
-    border: '2px solid var(--border)',
   },
 };
