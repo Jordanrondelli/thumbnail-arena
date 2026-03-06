@@ -28,7 +28,8 @@ function ResultsContent({ password }) {
   if (loading) {
     return (
       <div style={styles.center}>
-        <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Chargement...</p>
+        <div style={{ fontSize: '3rem', animation: 'pulse 1.5s ease-in-out infinite' }}>⏳</div>
+        <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-title)', marginTop: '12px', fontSize: '1.1rem' }}>Chargement...</p>
       </div>
     );
   }
@@ -36,9 +37,18 @@ function ResultsContent({ password }) {
   if (!data || data.results.length === 0) {
     return (
       <div style={styles.center}>
-        <h2 style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-title)' }}>Aucun résultat</h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '8px' }}>
-          Les résultats apparaîtront après les premiers tests.
+        <div style={{ fontSize: '4rem', marginBottom: '16px', animation: 'float 2s ease-in-out infinite' }}>📊</div>
+        <h2 style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-title)', fontSize: '1.5rem' }}>Aucun resultat</h2>
+        <p style={{
+          color: 'var(--text-muted)',
+          fontSize: '1rem',
+          marginTop: '8px',
+          background: 'var(--bg-card)',
+          padding: '12px 24px',
+          borderRadius: '14px',
+          border: '2px solid var(--border)',
+        }}>
+          Les resultats apparaitront apres les premiers tests.
         </p>
       </div>
     );
@@ -51,9 +61,9 @@ function ResultsContent({ password }) {
     <div style={styles.page} className="slide-up">
       {/* Global stats */}
       <div style={styles.statsBar}>
-        <StatBadge label="Participants" value={stats.totalSessions} />
-        <StatBadge label="Sessions valides" value={stats.validSessions} />
-        <StatBadge label="Variantes" value={stats.totalVariants} />
+        <StatBadge label="Participants" value={stats.totalSessions} emoji="👥" color="var(--purple)" />
+        <StatBadge label="Sessions valides" value={stats.validSessions} emoji="✅" color="var(--green)" />
+        <StatBadge label="Variantes" value={stats.totalVariants} emoji="🎨" color="var(--pink)" />
       </div>
 
       {/* Hero winner */}
@@ -67,41 +77,65 @@ function ResultsContent({ password }) {
               <div style={styles.heroMedal}>🏆</div>
               <h2 style={styles.heroTitle}>Miniature gagnante</h2>
               <div style={styles.heroScore}>{formatScore(winner.compositeScore)}<span style={styles.heroScoreUnit}>/100</span></div>
-              <p style={styles.heroPhrase}>
-                Gagne {Math.round(winner.winRate * 100)}% de ses duels. Clics en {winner.avgReactionMs}ms en moyenne. Mémorisée par {Math.round(winner.memoryScore * 100)}% des participants.
-              </p>
+              <div style={styles.heroStats}>
+                <div style={styles.heroPill}>
+                  <span>🎯</span> {Math.round(winner.winRate * 100)}% wins
+                </div>
+                <div style={styles.heroPill}>
+                  <span>⚡</span> {winner.avgReactionMs}ms
+                </div>
+                <div style={styles.heroPill}>
+                  <span>🧠</span> {Math.round(winner.memoryScore * 100)}% memo
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Ranking */}
-      <h2 style={styles.sectionTitle}>Classement complet</h2>
+      <div style={styles.sectionHeader}>
+        <span style={{ fontSize: '1.5rem' }}>🏅</span>
+        <h2 style={styles.sectionTitle}>Classement complet</h2>
+      </div>
       <div style={styles.grid}>
         {data.results.map((r, i) => (
-          <ResultCard key={r.id} result={r} rank={i + 1} />
+          <ResultCard key={r.id} result={r} rank={i + 1} index={i} />
         ))}
       </div>
     </div>
   );
 }
 
-function StatBadge({ label, value }) {
+function StatBadge({ label, value, emoji, color }) {
   return (
     <div style={styles.statBadge}>
-      <span style={styles.statValue}>{value}</span>
+      <span style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{emoji}</span>
+      <span style={{ ...styles.statValue, color }}>{value}</span>
       <span style={styles.statLabel}>{label}</span>
     </div>
   );
 }
 
-function ResultCard({ result, rank }) {
+function ResultCard({ result, rank, index }) {
   const r = result;
+  const isTop3 = rank <= 3;
+  const borderColor = rank === 1 ? 'var(--purple)' : rank === 2 ? 'var(--pink)' : rank === 3 ? 'var(--orange)' : 'var(--border)';
+
   return (
-    <div style={styles.card}>
+    <div style={{
+      ...styles.card,
+      borderColor,
+      animation: `slideUp 0.4s ease-out ${index * 0.06}s both`,
+      ...(isTop3 ? { boxShadow: `var(--shadow-md), 0 4px 0 ${borderColor}33` } : {}),
+    }}>
       <div style={styles.cardImgWrap}>
         <img src={`/uploads/${r.filename}`} alt="" style={styles.cardImg} />
-        <div style={styles.rankBadge}>
+        <div style={{
+          ...styles.rankBadge,
+          background: isTop3 ? 'linear-gradient(135deg, var(--purple), var(--pink))' : 'rgba(255,255,255,0.95)',
+          color: isTop3 ? 'white' : 'var(--text-secondary)',
+        }}>
           {rank <= 3 ? medals[rank - 1] : `#${rank}`}
         </div>
       </div>
@@ -112,9 +146,9 @@ function ResultCard({ result, rank }) {
         </div>
 
         <div style={styles.metricsRow}>
-          <MetricPill label="Win Rate" value={`${Math.round(r.winRate * 100)}%`} />
-          <MetricPill label="Vitesse" value={`${formatScore(r.speedNorm)}`} sub="/100" />
-          <MetricPill label="Mémoire" value={`${formatScore(r.memoryScore)}`} sub="/100" />
+          <MetricPill label="Win Rate" value={`${Math.round(r.winRate * 100)}%`} emoji="🎯" />
+          <MetricPill label="Vitesse" value={`${formatScore(r.speedNorm)}`} sub="/100" emoji="⚡" />
+          <MetricPill label="Memoire" value={`${formatScore(r.memoryScore)}`} sub="/100" emoji="🧠" />
         </div>
 
         <div style={styles.radarRow}>
@@ -130,9 +164,10 @@ function ResultCard({ result, rank }) {
   );
 }
 
-function MetricPill({ label, value, sub }) {
+function MetricPill({ label, value, sub, emoji }) {
   return (
     <div style={styles.metric}>
+      <span style={{ fontSize: '0.8rem', marginBottom: '2px' }}>{emoji}</span>
       <span style={styles.metricLabel}>{label}</span>
       <span style={styles.metricValue}>{value}{sub && <span style={styles.metricSub}>{sub}</span>}</span>
     </div>
@@ -145,7 +180,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 60px)',
+    minHeight: 'calc(100vh - 68px)',
     padding: '24px',
   },
   page: {
@@ -155,7 +190,7 @@ const styles = {
   },
   statsBar: {
     display: 'flex',
-    gap: '12px',
+    gap: '14px',
     marginBottom: '32px',
     flexWrap: 'wrap',
   },
@@ -164,45 +199,48 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     background: 'var(--bg-card)',
-    border: '1px solid var(--border)',
-    borderRadius: '12px',
-    padding: '16px 24px',
+    border: '3px solid var(--border)',
+    borderRadius: '20px',
+    padding: '18px 24px',
     flex: 1,
     minWidth: '140px',
+    boxShadow: 'var(--shadow-sm)',
+    transition: 'all 0.25s ease',
   },
   statValue: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.8rem',
-    fontWeight: 800,
-    color: 'var(--yellow)',
+    fontSize: '2rem',
+    fontWeight: 700,
   },
   statLabel: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.75rem',
+    fontFamily: 'var(--font-body)',
+    fontSize: '0.8rem',
     color: 'var(--text-muted)',
-    marginTop: '4px',
+    marginTop: '2px',
+    fontWeight: 600,
   },
   hero: {
-    background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(250,204,21,0.06) 100%)',
-    border: '1px solid var(--yellow-dim)',
-    borderRadius: '20px',
-    padding: '28px',
+    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(236, 72, 153, 0.08) 100%)',
+    border: '3px solid var(--purple)',
+    borderRadius: '28px',
+    padding: '32px',
     marginBottom: '40px',
+    boxShadow: '0 8px 40px rgba(139, 92, 246, 0.12), 0 6px 0 rgba(139, 92, 246, 0.08)',
   },
   heroInner: {
     display: 'flex',
-    gap: '28px',
+    gap: '32px',
     alignItems: 'center',
     flexWrap: 'wrap',
   },
   heroImgWrap: {
     flex: '0 0 auto',
-    width: '320px',
+    width: '340px',
     maxWidth: '100%',
-    borderRadius: '14px',
+    borderRadius: '20px',
     overflow: 'hidden',
-    border: '2px solid var(--yellow)',
-    boxShadow: '0 0 30px var(--yellow-glow)',
+    border: '4px solid var(--purple)',
+    boxShadow: '0 8px 30px rgba(139, 92, 246, 0.25)',
   },
   heroImg: {
     width: '100%',
@@ -215,51 +253,73 @@ const styles = {
     minWidth: '200px',
   },
   heroMedal: {
-    fontSize: '2rem',
+    fontSize: '2.5rem',
     marginBottom: '4px',
+    animation: 'float 2s ease-in-out infinite',
+    display: 'inline-block',
   },
   heroTitle: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.3rem',
-    color: 'var(--yellow)',
+    fontSize: '1.4rem',
+    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
     marginBottom: '8px',
   },
   heroScore: {
     fontFamily: 'var(--font-title)',
-    fontSize: '3.5rem',
-    fontWeight: 800,
+    fontSize: '4rem',
+    fontWeight: 700,
     color: 'var(--text-primary)',
     lineHeight: 1,
   },
   heroScoreUnit: {
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     color: 'var(--text-muted)',
-    fontWeight: 600,
+    fontWeight: 500,
   },
-  heroPhrase: {
-    fontFamily: 'var(--font-mono)',
+  heroStats: {
+    display: 'flex',
+    gap: '8px',
+    marginTop: '16px',
+    flexWrap: 'wrap',
+  },
+  heroPill: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    background: 'var(--bg-card)',
+    padding: '8px 14px',
+    borderRadius: '12px',
     fontSize: '0.85rem',
+    fontFamily: 'var(--font-body)',
+    fontWeight: 700,
     color: 'var(--text-secondary)',
-    marginTop: '12px',
-    lineHeight: 1.6,
+    border: '2px solid var(--border)',
+  },
+  sectionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '20px',
   },
   sectionTitle: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.4rem',
+    fontSize: '1.5rem',
     color: 'var(--text-primary)',
-    marginBottom: '20px',
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '16px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+    gap: '18px',
   },
   card: {
     background: 'var(--bg-card)',
-    border: '1px solid var(--border)',
-    borderRadius: '16px',
+    border: '3px solid var(--border)',
+    borderRadius: '22px',
     overflow: 'hidden',
-    transition: 'border-color 0.2s',
+    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    boxShadow: 'var(--shadow-sm)',
   },
   cardImgWrap: {
     position: 'relative',
@@ -272,40 +332,44 @@ const styles = {
   },
   rankBadge: {
     position: 'absolute',
-    top: '10px',
-    left: '10px',
-    background: 'rgba(0,0,0,0.75)',
-    borderRadius: '8px',
-    padding: '4px 10px',
+    top: '12px',
+    left: '12px',
+    borderRadius: '12px',
+    padding: '6px 12px',
     fontFamily: 'var(--font-title)',
     fontSize: '1rem',
-    fontWeight: 700,
+    fontWeight: 600,
+    boxShadow: 'var(--shadow-md)',
+    border: '2px solid rgba(255,255,255,0.5)',
   },
   cardBody: {
-    padding: '16px',
+    padding: '18px',
   },
   compositeRow: {
     display: 'flex',
     alignItems: 'baseline',
     gap: '4px',
-    marginBottom: '12px',
+    marginBottom: '14px',
   },
   compositeScore: {
     fontFamily: 'var(--font-title)',
-    fontSize: '2.2rem',
-    fontWeight: 800,
-    color: 'var(--text-primary)',
+    fontSize: '2.4rem',
+    fontWeight: 700,
+    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
     lineHeight: 1,
   },
   compositeUnit: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.9rem',
+    fontFamily: 'var(--font-body)',
+    fontSize: '1rem',
     color: 'var(--text-muted)',
+    fontWeight: 600,
   },
   metricsRow: {
     display: 'flex',
     gap: '8px',
-    marginBottom: '12px',
+    marginBottom: '14px',
   },
   metric: {
     flex: 1,
@@ -313,23 +377,27 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     background: 'var(--bg-secondary)',
-    borderRadius: '8px',
-    padding: '8px 4px',
+    borderRadius: '12px',
+    padding: '10px 4px 8px',
+    border: '2px solid var(--border)',
   },
   metricLabel: {
-    fontFamily: 'var(--font-mono)',
+    fontFamily: 'var(--font-body)',
     fontSize: '0.65rem',
     color: 'var(--text-muted)',
     marginBottom: '2px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
   },
   metricValue: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.9rem',
+    fontFamily: 'var(--font-title)',
+    fontSize: '1rem',
     color: 'var(--text-primary)',
-    fontWeight: 500,
+    fontWeight: 600,
   },
   metricSub: {
-    fontSize: '0.65rem',
+    fontSize: '0.7rem',
     color: 'var(--text-muted)',
   },
   radarRow: {
@@ -343,8 +411,9 @@ const styles = {
     gap: '16px',
   },
   detail: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.75rem',
+    fontFamily: 'var(--font-body)',
+    fontSize: '0.8rem',
     color: 'var(--text-muted)',
+    fontWeight: 600,
   },
 };

@@ -1,11 +1,11 @@
-const SIZE = 140;
+const SIZE = 150;
 const CENTER = SIZE / 2;
 const RADIUS = 52;
 
 const AXES = [
   { label: 'Win Rate', angle: -90 },
   { label: 'Vitesse', angle: 30 },
-  { label: 'Mémoire', angle: 150 },
+  { label: 'Memoire', angle: 150 },
 ];
 
 function polarToCart(angleDeg, r) {
@@ -19,7 +19,6 @@ function polarToCart(angleDeg, r) {
 export default function RadarChart({ winRate, speed, memory }) {
   const values = [winRate, speed, memory];
 
-  // Grid lines
   const gridLevels = [0.25, 0.5, 0.75, 1];
 
   const dataPoints = AXES.map((axis, i) => {
@@ -35,26 +34,26 @@ export default function RadarChart({ winRate, speed, memory }) {
       {gridLevels.map((level) => {
         const pts = AXES.map((axis) => polarToCart(axis.angle, RADIUS * level));
         const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ') + ' Z';
-        return <path key={level} d={path} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+        return <path key={level} d={path} fill="none" stroke="rgba(139, 92, 246, 0.1)" strokeWidth="1.5" />;
       })}
 
       {/* Axis lines */}
       {AXES.map((axis, i) => {
         const end = polarToCart(axis.angle, RADIUS);
-        return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />;
+        return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1.5" />;
       })}
 
       {/* Data polygon */}
-      <path d={dataPath} fill="rgba(250, 204, 21, 0.2)" stroke="#facc15" strokeWidth="2" />
+      <path d={dataPath} fill="rgba(139, 92, 246, 0.15)" stroke="#8B5CF6" strokeWidth="2.5" strokeLinejoin="round" />
 
       {/* Data dots */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="3" fill="#facc15" />
+        <circle key={i} cx={p.x} cy={p.y} r="4" fill="#8B5CF6" stroke="white" strokeWidth="2" />
       ))}
 
       {/* Labels */}
       {AXES.map((axis, i) => {
-        const pos = polarToCart(axis.angle, RADIUS + 18);
+        const pos = polarToCart(axis.angle, RADIUS + 20);
         return (
           <text
             key={i}
@@ -62,9 +61,10 @@ export default function RadarChart({ winRate, speed, memory }) {
             y={pos.y}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="rgba(255,255,255,0.4)"
-            fontSize="8"
-            fontFamily="DM Mono, monospace"
+            fill="#6B5A85"
+            fontSize="9"
+            fontFamily="Fredoka, sans-serif"
+            fontWeight="500"
           >
             {axis.label}
           </text>

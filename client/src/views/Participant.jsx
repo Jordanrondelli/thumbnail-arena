@@ -5,15 +5,23 @@ import { getSessionPairs, submitDuels, submitMemory } from '../utils/api';
 function StepIntro({ onStart }) {
   return (
     <div style={stepStyles.center} className="fade-in">
+      <div style={{ fontSize: '4rem', marginBottom: '16px', animation: 'float 2s ease-in-out infinite', display: 'inline-block' }}>🎮</div>
       <h1 style={stepStyles.introTitle}>Thumbnail Arena</h1>
-      <p style={stepStyles.introText}>
-        Tu vas voir des paires de miniatures. Clique sur celle qui attirerait ton attention dans un vrai feed YouTube.
-      </p>
-      <p style={stepStyles.introText}>
-        Tu as <span style={{ color: 'var(--yellow)', fontWeight: 700, fontFamily: 'var(--font-title)' }}>1,5 seconde</span> par choix.
-        Fais confiance à ton instinct.
-      </p>
-      <button style={stepStyles.startBtn} onClick={onStart}>C'est parti</button>
+      <div style={stepStyles.introCard}>
+        <p style={stepStyles.introText}>
+          Tu vas voir des paires de miniatures. Clique sur celle qui attirerait ton attention dans un vrai feed YouTube.
+        </p>
+        <div style={stepStyles.timerBadge}>
+          <span style={{ fontSize: '1.5rem' }}>⏱</span>
+          <span><strong>1,5 seconde</strong> par choix</span>
+        </div>
+        <p style={{ ...stepStyles.introText, fontSize: '0.95rem', color: 'var(--text-muted)' }}>
+          Fais confiance a ton instinct !
+        </p>
+      </div>
+      <button style={stepStyles.startBtn} onClick={onStart}>
+        C'est parti !
+      </button>
     </div>
   );
 }
@@ -118,11 +126,15 @@ function StepDuel({ pairs, onComplete }) {
         timedOut: false,
         trackingData: trackingRef.current,
       });
-    }, 200);
+    }, 250);
   };
 
   const progress = timeLeft / 1500;
-  const barColor = progress > 0.5 ? 'var(--yellow)' : progress > 0.2 ? 'var(--orange)' : 'var(--red)';
+  const barColor = progress > 0.5
+    ? 'linear-gradient(90deg, var(--green), #34D399)'
+    : progress > 0.2
+    ? 'linear-gradient(90deg, var(--orange), var(--yellow))'
+    : 'linear-gradient(90deg, var(--red), var(--pink))';
 
   return (
     <div style={duelStyles.container} className="fade-in">
@@ -132,7 +144,8 @@ function StepDuel({ pairs, onComplete }) {
       </div>
 
       <div style={duelStyles.counter}>
-        {currentIndex + 1} / {pairs.length}
+        <span style={duelStyles.counterCurrent}>{currentIndex + 1}</span>
+        <span style={duelStyles.counterTotal}> / {pairs.length}</span>
       </div>
 
       <div style={duelStyles.arena}>
@@ -144,9 +157,12 @@ function StepDuel({ pairs, onComplete }) {
           onClick={() => handleClick(pair.left.id)}
         >
           <img src={`/uploads/${pair.left.filename}`} alt="" style={duelStyles.thumbImg} />
+          {selected === pair.left.id && <div style={duelStyles.selectedOverlay}>&#10003;</div>}
         </button>
 
-        <div style={duelStyles.vs}>VS</div>
+        <div style={duelStyles.vs}>
+          <span style={duelStyles.vsText}>VS</span>
+        </div>
 
         <button
           style={{
@@ -156,6 +172,7 @@ function StepDuel({ pairs, onComplete }) {
           onClick={() => handleClick(pair.right.id)}
         >
           <img src={`/uploads/${pair.right.filename}`} alt="" style={duelStyles.thumbImg} />
+          {selected === pair.right.id && <div style={duelStyles.selectedOverlay}>&#10003;</div>}
         </button>
       </div>
     </div>
@@ -180,19 +197,49 @@ function StepDistractor({ onComplete }) {
     return () => clearInterval(interval);
   }, [onComplete]);
 
-  const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+  const colors = [
+    { bg: '#FF6B6B', emoji: '🍎' },
+    { bg: '#4ECDC4', emoji: '🐸' },
+    { bg: '#FFE66D', emoji: '⭐' },
+    { bg: '#A78BFA', emoji: '🔮' },
+    { bg: '#FB923C', emoji: '🍊' },
+    { bg: '#60A5FA', emoji: '💎' },
+    { bg: '#F472B6', emoji: '🌸' },
+    { bg: '#34D399', emoji: '🍀' },
+  ];
 
   return (
     <div style={stepStyles.center} className="fade-in">
-      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-        Petite pause... regarde ces couleurs
+      <div style={{ fontSize: '2rem', marginBottom: '8px', animation: 'wiggle 1s ease-in-out infinite' }}>🧠</div>
+      <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '20px', fontFamily: 'var(--font-title)', fontWeight: 500 }}>
+        Petite pause... regarde ces jolies couleurs !
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', maxWidth: '320px', margin: '0 auto 24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', maxWidth: '340px', margin: '0 auto 28px' }}>
         {colors.map((c, i) => (
-          <div key={i} style={{ background: c, borderRadius: '10px', aspectRatio: '1', opacity: 0.8 }} />
+          <div key={i} style={{
+            background: c.bg,
+            borderRadius: '16px',
+            aspectRatio: '1',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.8rem',
+            boxShadow: `0 4px 0 ${c.bg}88`,
+            animation: `bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 0.05}s both`,
+          }}>
+            {c.emoji}
+          </div>
         ))}
       </div>
-      <div style={{ fontFamily: 'var(--font-title)', fontSize: '2.5rem', color: 'var(--yellow)' }}>
+      <div style={{
+        fontFamily: 'var(--font-title)',
+        fontSize: '3.5rem',
+        fontWeight: 700,
+        background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        animation: 'pulse 1s ease-in-out infinite',
+      }}>
         {countdown}
       </div>
     </div>
@@ -202,12 +249,21 @@ function StepDistractor({ onComplete }) {
 // --- Step Memory ---
 function StepMemory({ thumbnails, onComplete }) {
   const [selected, setSelected] = useState(new Set());
-  const distractorColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+  const distractorColors = [
+    { bg: '#FF6B6B', emoji: '🍎' },
+    { bg: '#4ECDC4', emoji: '🐸' },
+    { bg: '#FFE66D', emoji: '⭐' },
+    { bg: '#A78BFA', emoji: '🔮' },
+    { bg: '#FB923C', emoji: '🍊' },
+    { bg: '#60A5FA', emoji: '💎' },
+    { bg: '#F472B6', emoji: '🌸' },
+    { bg: '#34D399', emoji: '🍀' },
+  ];
 
   // Mix thumbnails with colored blocks
   const items = [
     ...thumbnails.map((t) => ({ type: 'thumb', ...t })),
-    ...distractorColors.map((c, i) => ({ type: 'color', id: `color-${i}`, color: c })),
+    ...distractorColors.map((c, i) => ({ type: 'color', id: `color-${i}`, ...c })),
   ].sort(() => Math.random() - 0.5);
 
   const toggle = (id) => {
@@ -225,31 +281,60 @@ function StepMemory({ thumbnails, onComplete }) {
 
   return (
     <div style={stepStyles.center} className="fade-in">
-      <h2 style={{ fontFamily: 'var(--font-title)', fontSize: '1.3rem', color: 'var(--yellow)', marginBottom: '8px' }}>
-        Test de mémorisation
+      <div style={{ fontSize: '2.5rem', marginBottom: '8px', animation: 'float 2s ease-in-out infinite' }}>🧩</div>
+      <h2 style={{
+        fontFamily: 'var(--font-title)',
+        fontSize: '1.5rem',
+        background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        marginBottom: '8px',
+      }}>
+        Test de memorisation
       </h2>
-      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+      <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '24px', fontWeight: 600 }}>
         Clique sur les miniatures que tu as vues pendant les duels
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', maxWidth: '600px', margin: '0 auto 24px' }}>
-        {items.map((item) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', maxWidth: '620px', margin: '0 auto 28px' }}>
+        {items.map((item, i) => (
           <button
             key={item.id}
             onClick={() => toggle(item.id)}
             style={{
-              border: selected.has(item.id) ? '3px solid var(--yellow)' : '3px solid transparent',
-              borderRadius: '10px',
+              border: selected.has(item.id) ? '4px solid var(--purple)' : '4px solid var(--border)',
+              borderRadius: '16px',
               overflow: 'hidden',
               cursor: 'pointer',
-              background: item.type === 'color' ? item.color : 'var(--bg-card)',
+              background: item.type === 'color' ? item.bg : 'var(--bg-card)',
               aspectRatio: '16/9',
               padding: 0,
-              boxShadow: selected.has(item.id) ? '0 0 15px var(--yellow-glow)' : 'none',
-              transition: 'all 0.2s ease',
+              boxShadow: selected.has(item.id) ? '0 0 20px var(--purple-light), 0 4px 0 rgba(139, 92, 246, 0.3)' : 'var(--shadow-sm)',
+              transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              animation: `slideUp 0.3s ease-out ${i * 0.03}s both`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              position: 'relative',
             }}
           >
-            {item.type === 'thumb' && (
+            {item.type === 'thumb' ? (
               <img src={`/uploads/${item.filename}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            ) : (
+              <span>{item.emoji}</span>
+            )}
+            {selected.has(item.id) && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(139, 92, 246, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+              }}>
+                &#10003;
+              </div>
             )}
           </button>
         ))}
@@ -263,11 +348,36 @@ function StepMemory({ thumbnails, onComplete }) {
 function StepThanks() {
   return (
     <div style={stepStyles.center} className="fade-in">
-      <h1 style={{ ...stepStyles.introTitle, fontSize: '2.5rem' }}>Merci !</h1>
-      <p style={stepStyles.introText}>
-        Ton avis compte énormément. Grâce à toi, je vais pouvoir choisir la meilleure miniature.
+      <div style={{
+        fontSize: '5rem',
+        marginBottom: '16px',
+        animation: 'bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}>🎉</div>
+      <h1 style={{
+        ...stepStyles.introTitle,
+        fontSize: '2.8rem',
+        animation: 'slideUp 0.5s ease-out 0.2s both',
+      }}>Merci !</h1>
+      <p style={{
+        ...stepStyles.introText,
+        animation: 'slideUp 0.5s ease-out 0.4s both',
+      }}>
+        Ton avis compte enormement. Grace a toi, on va trouver la meilleure miniature !
       </p>
-      <p style={{ fontSize: '2rem', marginTop: '16px' }}>🎯</p>
+      <div style={{
+        display: 'flex',
+        gap: '12px',
+        marginTop: '20px',
+        animation: 'slideUp 0.5s ease-out 0.6s both',
+      }}>
+        {['🏆', '🎯', '🚀'].map((e, i) => (
+          <span key={i} style={{
+            fontSize: '2rem',
+            animation: `float ${1.5 + i * 0.3}s ease-in-out infinite`,
+            display: 'inline-block',
+          }}>{e}</span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -312,6 +422,7 @@ export default function Participant() {
   if (step === 'loading') {
     return (
       <div style={stepStyles.center}>
+        <div style={{ fontSize: '4rem', marginBottom: '20px', animation: 'float 2s ease-in-out infinite', display: 'inline-block' }}>🎮</div>
         <button style={stepStyles.startBtn} onClick={init}>Commencer le test</button>
       </div>
     );
@@ -320,10 +431,23 @@ export default function Participant() {
   if (step === 'error') {
     return (
       <div style={stepStyles.center}>
-        <h2 style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-title)', marginBottom: '12px' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>😴</div>
+        <h2 style={{
+          color: 'var(--text-secondary)',
+          fontFamily: 'var(--font-title)',
+          marginBottom: '12px',
+          fontSize: '1.4rem',
+        }}>
           Test indisponible
         </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{error}</p>
+        <p style={{
+          color: 'var(--text-muted)',
+          fontSize: '1rem',
+          background: 'var(--bg-card)',
+          padding: '12px 24px',
+          borderRadius: '14px',
+          border: '2px solid var(--border)',
+        }}>{error}</p>
       </div>
     );
   }
@@ -344,35 +468,59 @@ const stepStyles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 60px)',
+    minHeight: 'calc(100vh - 68px)',
     padding: '24px',
     textAlign: 'center',
   },
   introTitle: {
     fontFamily: 'var(--font-title)',
-    fontSize: '2.8rem',
-    fontWeight: 800,
-    color: 'var(--yellow)',
+    fontSize: '3rem',
+    fontWeight: 700,
+    background: 'linear-gradient(135deg, var(--purple), var(--pink), var(--orange))',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
     marginBottom: '24px',
-    letterSpacing: '-0.02em',
+  },
+  introCard: {
+    background: 'var(--bg-card)',
+    border: '3px solid var(--border)',
+    borderRadius: '24px',
+    padding: '28px 32px',
+    maxWidth: '500px',
+    boxShadow: 'var(--shadow-md)',
+    marginBottom: '8px',
   },
   introText: {
-    fontSize: '1rem',
+    fontSize: '1.05rem',
     color: 'var(--text-secondary)',
     maxWidth: '480px',
     lineHeight: 1.7,
     marginBottom: '12px',
+    fontWeight: 600,
+  },
+  timerBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    background: 'linear-gradient(135deg, var(--purple-light), var(--pink-light))',
+    padding: '10px 20px',
+    borderRadius: '14px',
+    marginBottom: '12px',
+    fontFamily: 'var(--font-title)',
+    fontSize: '1rem',
+    color: 'var(--purple)',
   },
   startBtn: {
     marginTop: '24px',
-    padding: '14px 40px',
-    background: 'var(--yellow)',
-    color: 'var(--bg-primary)',
-    fontSize: '1.05rem',
-    fontWeight: 700,
-    borderRadius: '12px',
+    padding: '16px 48px',
+    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    color: 'white',
+    fontSize: '1.15rem',
+    fontWeight: 600,
+    borderRadius: '18px',
     fontFamily: 'var(--font-title)',
     letterSpacing: '0.02em',
+    boxShadow: '0 6px 20px rgba(139, 92, 246, 0.35), 0 4px 0 rgba(139, 92, 246, 0.2)',
   },
 };
 
@@ -382,7 +530,7 @@ const duelStyles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 60px)',
+    minHeight: 'calc(100vh - 68px)',
     padding: '16px',
     position: 'relative',
   },
@@ -391,43 +539,70 @@ const duelStyles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
+    height: '6px',
     background: 'var(--bg-secondary)',
+    borderRadius: '0 0 3px 3px',
   },
   timerBar: {
     height: '100%',
-    transition: 'width 0.05s linear, background 0.3s ease',
-    borderRadius: '0 2px 2px 0',
+    transition: 'width 0.05s linear',
+    borderRadius: '0 3px 3px 0',
   },
   counter: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.8rem',
-    color: 'var(--text-muted)',
     marginBottom: '24px',
+    background: 'var(--bg-card)',
+    padding: '8px 20px',
+    borderRadius: '14px',
+    border: '2px solid var(--border)',
+    boxShadow: 'var(--shadow-sm)',
+  },
+  counterCurrent: {
+    fontFamily: 'var(--font-title)',
+    fontSize: '1.2rem',
+    fontWeight: 700,
+    color: 'var(--purple)',
+  },
+  counterTotal: {
+    fontFamily: 'var(--font-body)',
+    fontSize: '1rem',
+    color: 'var(--text-muted)',
   },
   arena: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '16px',
+    gap: '20px',
     width: '100%',
-    maxWidth: '900px',
+    maxWidth: '920px',
   },
   thumbBtn: {
     flex: 1,
     maxWidth: '420px',
-    background: 'none',
-    border: '3px solid var(--border)',
-    borderRadius: '14px',
+    background: 'var(--bg-card)',
+    border: '4px solid var(--border)',
+    borderRadius: '20px',
     overflow: 'hidden',
     cursor: 'pointer',
     padding: 0,
-    transition: 'all 0.2s ease',
+    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    boxShadow: 'var(--shadow-md)',
+    position: 'relative',
   },
   thumbSelected: {
-    borderColor: 'var(--yellow)',
-    boxShadow: '0 0 25px var(--yellow-glow)',
-    animation: 'glow 1s ease infinite',
+    borderColor: 'var(--purple)',
+    boxShadow: '0 0 30px rgba(139, 92, 246, 0.4), 0 6px 0 rgba(139, 92, 246, 0.2)',
+    transform: 'scale(1.03)',
+  },
+  selectedOverlay: {
+    position: 'absolute',
+    inset: 0,
+    background: 'rgba(139, 92, 246, 0.15)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '3rem',
+    color: 'var(--purple)',
+    animation: 'bounceIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
   },
   thumbImg: {
     width: '100%',
@@ -436,10 +611,20 @@ const duelStyles = {
     display: 'block',
   },
   vs: {
-    fontFamily: 'var(--font-title)',
-    fontWeight: 800,
-    fontSize: '1.5rem',
-    color: 'var(--text-muted)',
     flexShrink: 0,
+    width: '52px',
+    height: '52px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, var(--orange), var(--pink))',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)',
+  },
+  vsText: {
+    fontFamily: 'var(--font-title)',
+    fontWeight: 700,
+    fontSize: '1rem',
+    color: 'white',
   },
 };

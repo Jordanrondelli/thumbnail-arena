@@ -6,40 +6,45 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '60px',
-    background: 'rgba(10, 10, 15, 0.9)',
-    backdropFilter: 'blur(12px)',
-    borderBottom: '1px solid var(--border)',
+    height: '68px',
+    background: 'rgba(255, 248, 240, 0.85)',
+    backdropFilter: 'blur(16px)',
+    borderBottom: '3px solid var(--border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 24px',
+    padding: '0 28px',
     zIndex: 1000,
   },
   logo: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.2rem',
-    fontWeight: 800,
-    color: 'var(--yellow)',
-    letterSpacing: '-0.02em',
+    fontSize: '1.4rem',
+    fontWeight: 700,
+    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    letterSpacing: '-0.01em',
   },
   links: {
     display: 'flex',
     gap: '8px',
   },
   link: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.8rem',
-    padding: '6px 14px',
-    borderRadius: '6px',
+    fontFamily: 'var(--font-title)',
+    fontSize: '0.9rem',
+    fontWeight: 500,
+    padding: '8px 18px',
+    borderRadius: '14px',
     color: 'var(--text-secondary)',
     textDecoration: 'none',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    border: '2px solid transparent',
   },
   activeLink: {
-    color: 'var(--bg-primary)',
-    background: 'var(--yellow)',
-    fontWeight: 500,
+    color: 'white',
+    background: 'linear-gradient(135deg, var(--purple), var(--pink))',
+    border: '2px solid transparent',
+    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
   },
 };
 
@@ -64,7 +69,7 @@ export default function Navbar() {
           to="/results"
           style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.activeLink : {}) })}
         >
-          Résultats
+          Resultats
         </NavLink>
       </div>
     </nav>
